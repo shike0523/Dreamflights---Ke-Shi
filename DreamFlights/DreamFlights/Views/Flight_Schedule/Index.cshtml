@@ -1,0 +1,189 @@
+﻿@model PaginatedList<DreamFlights.Models.Flight_Schedule>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/jqueryui/jquery-ui.js"></script>
+
+<script>
+    var idleTime = 0;
+    $(document).ready(function () {
+        //Increment the idle time counter every minute.
+        var idleInterval = setInterval(timerIncrement, 1000); // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间
+        //var idleIntervalReload = setInterval(timerIncrementReload, 1500);
+
+        //Zero the idle timer on mouse movement.
+        $(this).mousemove(function (e) {
+            idleTime = 0;
+        });
+        $(this).keypress(function (e) {
+            idleTime = 0;
+        });
+    });
+
+    // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间;每隔1秒都检查一次无操作时间是否到达5秒,如果到达了就刷新一次页面
+    function timerIncrement() {
+        idleTime = idleTime + 1;
+        if (idleTime > 25) { // 25 seconds
+            window.location.reload();
+        } else if (idleTime === 1) {
+            $.ajax({
+                    url: '@Url.Action("Validate", "Flight_Schedule")',  // 生成一个url,表示跳转到控制器下”Approver”下的"Validate"方法
+                    type: "post"
+             });
+        }
+
+    }
+
+  $( function() {
+      $("#datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
+
+      $("#searchID").click(function () {
+          $('.searchString').val('');
+      });
+
+      $(".searchString").click(function () {
+          $('#searchID').val('');
+      });
+  } );
+</script>
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td>
+                        Filter by ID: <input id="searchID" type="text" name="searchID" value="@ViewData["currentFilterID"]" />
+                        <input type="submit" value="Search" class="btn btn-default" /> |
+                        <a asp-action="Index">Back to Full List</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Filter by Depart: <input class="searchString" type="text" name="searchStringDepartFrom" value="@ViewData["currentFilterDepartFrom"]" />
+                        Filter by Arrive: <input class="searchString" type="text" name="searchStringArriveTo" value="@ViewData["currentFilterArriveTo"]" />
+                        Filter by Time of depart: <input class="searchString" id="datepicker" type="text" name="searchStringDepartDate" value="@ViewData["currentFilterDepartDate"]" />
+                        <input type="submit" value="Search" class="btn btn-default" /> |
+                        <a asp-action="Index">Back to Full List</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>        
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Flight_ScheduleID
+            </th>
+            <th>
+                Depart time
+            </th>
+            <th>
+                Arrive time
+            </th>
+            <th>
+                DepartFrom
+            </th>
+            <th>
+                ArriveAt
+            </th>
+            <th>
+                Eco
+            </th>
+            <th>
+                Busi
+            </th>
+            <th>
+                PremE
+            </th>
+            <th>
+                First
+            </th>
+            <th>
+                Route
+            </th>
+            AirCraft
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Flight_ScheduleID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DepartDateTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ArriveDateTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Route.FromCity.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Route.ToCity.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Economy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Business)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PremEconomy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.First)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Route.RouteID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AirCraft.AirCraftModel)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Flight_ScheduleID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Flight_ScheduleID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Flight_ScheduleID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.PageIndex - 1)"
+   asp-route-currentFilterDepartFrom="@ViewData["currentFilterDepartFrom"]"
+   asp-route-currentFilterArriveTo="@ViewData["currentFilterArriveTo"]"
+   asp-route-currentFilterDepartDate="@ViewData["currentFilterDepartDate"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-page="@(Model.PageIndex + 1)"
+   asp-route-currentFilterDepartFrom="@ViewData["currentFilterDepartFrom"]"
+   asp-route-currentFilterArriveTo="@ViewData["currentFilterArriveTo"]"
+   asp-route-currentFilterDepartDate="@ViewData["currentFilterDepartDate"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

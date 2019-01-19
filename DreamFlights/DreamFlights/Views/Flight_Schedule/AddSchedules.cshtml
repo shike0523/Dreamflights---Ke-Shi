@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "AddSchedules";
+}
+
+<h2>AddSchedules</h2>
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/jqueryui/jquery-ui.js"></script>
+
+<script>
+    $(function () {
+        $("#datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
+        $("#datepicker2").datepicker({ dateFormat: 'dd/mm/yy' });
+    });
+</script>
+
+<form id="sampleForm" name="myform2" asp-action="AddSchedules">
+    <div class="row">
+        <div class="col-md-4">
+            <p>From Date: <input name="scheduleFromDate" type="text" id="datepicker" class="form-control"></p>
+        </div>
+        <div class="col-md-4">
+            <p>To Date: <input name="scheduleToDate" type="text" id="datepicker2" class="form-control"></p>
+        </div>
+    </div>
+    <input type="submit" value="AddSchedules" class="btn btn-default" />
+</form>

@@ -1,0 +1,42 @@
+﻿@model DreamFlights.Models.Route
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Route</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BasicFare)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BasicFare)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FromCity)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FromCity.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ToCity)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ToCity.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AveDuration)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AveDuration)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.RouteID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

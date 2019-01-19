@@ -1,0 +1,474 @@
+﻿@model IEnumerable<DreamFlights.Models.Route>
+@{
+    ViewData["Title"] = "Search";
+}
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/jqueryui/jquery-ui.js"></script>
+
+<script src="~/ViewLibaries/HomeSearch/Sliders/FromDepartSliderMobile.js"></script>
+
+<style>
+    .scrollClass {
+        height: 650px;
+        width: 450px;
+        overflow-y: scroll;
+    }
+
+    .containerStack {
+        margin-top: -15px;
+        width: 100px;
+        height: 70px;
+        position: fixed;
+        /* center the element */
+        right: 0;
+        left: 0;
+        /* horizontally and vertically center */
+        margin-right: auto;
+        margin-left: auto;
+        /* 调整垂直位置(以百分比来计算,调整top参数即可) */
+        top: 95%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        z-index: 5;
+        display: block;
+    }
+</style>
+
+<script>
+    $(function () {
+        //以下几个变量必须是全局变量,不然每次点击book按钮都不能保持其值
+        var thisIdDepart;
+        var thisNameDepart;
+        var thisIdReturn;
+        var thisNameReturn;
+        var r;
+        var Return;
+        var totalPriceDepart;
+        var totalPriceReturn;
+        $("button[name=departOptions], button[name=returnOptions]").click(function () {
+            if ('@(ViewBag.onewayOrReturn)' === "return") {
+                var targetUrl;
+                if (this.name === "departOptions") {
+                    //将之前选取的航班的"book"按钮里的文字复原
+                    if (thisIdDepart !== null) {
+                        if ($("#languageSelect").val() === "zh") {
+                            $("button[id=" + thisIdDepart + "][name=" + thisNameDepart + "]").html("出发 预定");
+                        } else {
+                            $("button[id=" + thisIdDepart + "][name=" + thisNameDepart + "]").html("Book depart");
+                        }
+                    }
+                    thisIdDepart = this.id;
+                    thisNameDepart = this.name;
+                    r = $("div[id=" + thisIdDepart + "][name=" + thisNameDepart + "]").html();
+                    totalPriceDepart = $("span[id=" + thisIdDepart + "][name=" + thisNameDepart + "]").html();
+                    if ($("#languageSelect").val() === "zh") {
+                        $(this).html("已选");
+                    } else {
+                        $(this).html("selected"); //注：不可以用this.html("selected"),因为无法识别
+                    }
+                    $("#departLists").hide();
+                    $("#returnLists").show();
+                } else if (this.name === "returnOptions") {  //当点击的是回程(return)的按钮时
+                    //将之前选取的航班的"book"按钮里的文字复原
+                    if (thisIdReturn !== null) {
+                        if ($("#languageSelect").val() === "zh") {
+                            $("button[id=" + thisIdReturn + "][name=" + thisNameReturn + "]").html("返程 预定");
+                        } else {
+                            $("button[id=" + thisIdReturn + "][name=" + thisNameReturn + "]").html("Book return");
+                        }
+                    }
+                    thisIdReturn = this.id;
+                    thisNameReturn = this.name;
+                    Return = $("div[id=" + thisIdReturn + "][name=" + thisNameReturn + "]").html();
+                    totalPriceReturn = $("span[id=" + thisIdReturn + "][name=" + thisNameReturn + "]").html();
+                    if ($("#languageSelect").val() === "zh") {
+                        $(this).html("已选");
+                    } else {
+                        $(this).html("selected"); //注：不可以用this.html("selected"),因为无法识别
+                    }
+                }
+
+                //如果depart和return都已经选取,那么就进入下一页
+                if (thisIdDepart !== null && thisIdReturn !== null) {
+                    targetUrl = '/Home/Book?r=' + r.toString() + '&Return=' + Return.toString() + '&totalPriceDepart=' + totalPriceDepart + '&totalPriceReturn=' + totalPriceReturn;  //加上特定参数组成新的rul以便进行页面跳转
+                    window.location.href = targetUrl;  //根据以上生成的url进行页面跳转
+                }
+            } else {
+                thisIdDepart = this.id;
+                thisNameDepart = this.name;
+                r = $("div[id=" + thisIdDepart + "][name=" + thisNameDepart + "]").html();
+                totalPriceDepart = $("span[id=" + thisIdDepart + "][name=" + thisNameDepart + "]").html();
+                targetUrl = '/Home/Book?r=' + r.toString() + '&totalPriceDepart=' + totalPriceDepart;  //加上特定参数组成新的rul以便进行页面跳转
+                window.location.href = targetUrl;  //根据以上生成的url进行页面跳转
+            }          
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        var mobileScreenWidth = $(window).width();
+        $(".scrollClass").css({
+            'width': mobileScreenWidth + 'px'
+        });
+
+        //显示/隐藏(toggle)details(航班娱乐设施)
+        $("a[name*='Amenities']").click(function () {
+            if ($(this).parent().parent().parent().next().is(":visible")) {
+                $(this).parent().parent().parent().next().hide();
+                $(this).html(TranslateLanguage("Show details", "展开"));
+            } else {
+                $(this).parent().parent().parent().next().show();
+                $(this).html(TranslateLanguage("Hide details", "收起"));
+            }
+        });
+
+        //以下对checkbox的页面刷新后的初始值以及没有checked(针对value="0"的checkbox,因为任何cheackbox没有checked时的值都是0,会与之冲突造成后台计算错误)的checkbox的是否checked进行设置
+        //如果checkbox已经checked,则表单直接提交checkbox的值(通过将type="hidden"的input全部无效化(disabled))
+        $("input:checked").prev().attr("disabled", true);
+        //如果checkbox没有checked,则将input的变量(stops0/stops1/stops2)变成另外一个值(这里是100)而不是0
+        $("input[id*='stops']").click(checkHidden);
+        function checkHidden() {
+            //注：判定checkbox是否checked,是“this.checked”而不是“$(this).checked”
+            if (this.checked) {
+                $(this).prev().attr("disabled", true);
+            } else {
+                $(this).prev().removeAttr("disabled");
+            }
+
+            ////点击stops的checkbox后(以上的checkHidden函数)马上提交fliter表单
+            //$("#FilterForm").submit();
+        }
+
+        $("#submitFilter").click(SubmitFilter);
+        function SubmitFilter() {
+            $("#FilterForm").submit();
+        }
+    });
+</script>
+
+@*<div>@ViewBag.cabin</div>
+    <div>@ViewBag.timeEarliestFromDepartConverted</div>*@
+
+@{
+    List<DreamFlights.ViewModels.CandidateTripVM> candidateTrips = ViewBag.Trips;
+    List<DreamFlights.ViewModels.CandidateTripVM> candidateTripsReturn = ViewBag.TripsReturn;
+}
+
+<div class="containerStack">
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#Filter"><img src="~/ViewLibaries/HomeSearch/Sliders/Images/icons8-slider-30.png" /> @Localizer["Filter"] </button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="Filter" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-2">
+                    <form id="FilterForm" asp-action="FilterForm">
+                        <div>
+                            <input id="timeEarliestFromDepart" name="timeEarliestFromDepart" value="@ViewBag.timeEarliestFromDepart" style="display:none">
+                            <input id="timeLatiestFromDepart" name="timeLatiestFromDepart" value="@ViewBag.timeLatiestFromDepart" style="display:none">
+                        </div>
+                        <div>
+                            <input id="timeEarliestFromArrive" name="timeEarliestFromArrive" value="@ViewBag.timeEarliestFromArrive" style="display:none">
+                            <input id="timeLatiestFromArrive" name="timeLatiestFromArrive" value="@ViewBag.timeLatiestFromArrive" style="display:none">
+                        </div>
+                        <div>
+                            <input id="timeEarliestToDepart" name="timeEarliestToDepart" value="@ViewBag.timeEarliestToDepart" style="display:none">
+                            <input id="timeLatiestToDepart" name="timeLatiestToDepart" value="@ViewBag.timeLatiestToDepart" style="display:none">
+                        </div>
+                        <div>
+                            <input id="timeEarliestToArrive" name="timeEarliestToArrive" value="@ViewBag.timeEarliestToArrive" style="display:none">
+                            <input id="timeLatiestToArrive" name="timeLatiestToArrive" value="@ViewBag.timeLatiestToArrive" style="display:none">
+                        </div>
+                        <input type="hidden" name="stops0" value="100">
+                        <!--Razor对html进行操作和编辑,这里是Razor通过ViewBag对checkbox的“checked”进行操作-->
+                        <input id="stops0" type="checkbox" name="stops0" value="0" @if (ViewBag.stops0 == 0) { <text> checked</text>} /> 0 @Localizer["stops"]<br>
+                        <input type="hidden" name="stops1" value="100">
+                        <input id="stops1" type="checkbox" name="stops1" value="1" @if (ViewBag.stops1 == 1) { <text> checked</text>}> 1 @Localizer["stops"]<br>
+                        <input type="hidden" name="stops2" value="100">
+                        <input id="stops2" type="checkbox" name="stops2" value="2" @if (ViewBag.stops2 == 2) { <text> checked</text>}> 2 @Localizer["stops"]<br>
+                    </form>
+                    <div>
+                        @Localizer["Take off"]: @ViewBag.FromCityName
+                        <div id="slider-rangeFromDepart"></div>
+                        <span id="timeFromDepart"></span>
+                    </div>
+                    <div>
+                        @Localizer["Landing"]: @ViewBag.ToCityName
+                        <div id="slider-rangeFromArrive"></div>
+                        <span id="timeFromArrive"></span>
+                    </div>
+                    <div>
+                        @Localizer["Take off"]: @ViewBag.ToCityName
+                        <div id="slider-rangeToDepart"></div>
+                        <span id="timeToDepart"></span>
+                    </div>
+                    <div>
+                        @Localizer["Landing"]: @ViewBag.FromCityName
+                        <div id="slider-rangeToArrive"></div>
+                        <span id="timeToArrive"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="submitFilter" class="btn btn-default" data-dismiss="modal">
+                     Submit filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="departLists">
+    <div>
+        @{
+            int depId = 0;
+            int i = 0;
+
+            foreach (var trip in candidateTrips)
+            {
+                var r = "";
+                var stops = trip.stopList.Count() - 2;
+
+                @*if (trip.Entertainment)
+                    {
+                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-play-64.png" class="imgDisplay" style="width:18px;height:18px" />
+                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-play-64.png" class="imgDisplay" style="width:18px;height:18px" />
+                    }*@
+                <div>
+                    <div class="panel panel-default" style="margin-left:0px">
+                        <div class="panel-body" style="padding:3px">
+                            <div id=@depId ; name="departOptions" style="display: block;">
+                                @foreach (var route in trip.RouteList)
+                                {
+                                    r = r + route + " ";
+                                }
+                                @r
+                            </div>
+                            <div style="width:150px;margin-left:0px;float:left">
+                                <div>
+                                    <font size="2">@trip.stopList.First()</font>
+                                    @*@trip.stopList.SkipWhile(s => s != @trip.stopList.First()).Skip(1).First()*@
+                                </div>
+                                <div>
+                                    <font size="2">@trip.DepartTime</font>
+                                </div>
+                                <div>
+                                    <a name="Amenities" style="cursor:pointer">@Localizer["Amenity details"]</a>
+                                </div>
+                                <div>
+                                    @stops @Localizer["stops"]
+                                </div>
+                            </div>
+                            <div style="width:100px;float:left; display:none">
+                                @foreach (var stop in trip.stopList)
+                                {
+                                    @:<div>
+                                        if (!(trip.stopList.Last() == stop) && !(trip.stopList.First() == stop))
+                                        {
+                                            <div>stop at:</div>
+                                            <div>
+                                                <span class="label label-primary">@stop</span>
+                                            </div>
+                                        }
+                                    @:</div>
+                                }
+                            </div>
+                            <div class="pull-right" style="width:150px;float:left">
+                                <div class="pull-right">@trip.stopList.Last()</div>
+                                <div>
+                                    <div>
+                                        Arrive:
+                                    </div>
+                                    <div>
+                                        @trip.ArrivetTime
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        TotalPrice:$
+                                    </span>
+                                    <span id=@depId  name="departOptions">
+                                        @trip.TotalPrice
+                                    </span>
+                                    <span>
+                                        <button id=@depId ; name="departOptions" type="button" class="btn btn-primary pull-right">@Localizer["Book depart"]</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer" style="padding: 3px; display:none">
+                            @foreach (var stop in trip.stopList)
+                            {
+                                if (stop == @trip.stopList.Last())
+                                {
+                                    break;
+                                }
+                                <div style="height:auto; border:1px solid black; padding: 2px; margin-top:2px">
+                                    <div>
+                                        <span>@stop</span>
+                                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-chevron-right-48.png" class="imgDisplay" style="width:18px;height:18px" />
+                                        <span class="label label-info">
+                                            <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-airplane-mode-on-24.png" class="imgDisplay" style="width:15px;height:15px" />
+                                            <span style="font-size: 10px">@trip.AirCraftModelList.ElementAt(i)</span>
+                                        </span>
+                                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-chevron-right-48.png" class="imgDisplay" style="width:18px;height:18px" />
+                                        <span>@trip.stopList.SkipWhile(s => s != stop).Skip(1).First()</span>
+                                    </div>
+                                    <!--一下两个标签中如果有class="pull-right"的话会导致显示不正常(上下元素串行)-->
+                                    <div>
+                                        <div>
+                                            <span class="label label-default">Flight code:</span>
+                                            @trip.AirlineCodeList.ElementAt(i)
+                                            <span class="label label-default">Amenities:</span>
+                                            @if (trip.EntertainmentList.ElementAt(i))
+                                            {
+                                                <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-play-64.png" class="imgDisplay" style="width:12px;height:12px" />
+                                            }
+                                            @if (trip.WiFiList.ElementAt(i))
+                                            {
+                                                <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-wi-fi-connected-32.png" class="imgDisplay" style="width:12px;height:12px" />
+                                            }
+                                            @if (trip.ACPowerList.ElementAt(i++)) //单次循环(foreach (var trip in candidateTrips))中的最后一个i要进行i++,以确保循环到下一个flight schedule时不会显示重复的内容
+                                            {
+                                                <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-electrical-30.png" class="imgDisplay" style="width:12px;height:12px" />
+                                            }
+                                        </div>                                       
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                depId++;
+                i = 0; //将当前航线panel的amenities的循环清零
+            }
+        }
+    </div>
+</div>
+
+<div id="returnLists" style="display:none">
+    <div>
+        @{
+            depId = 0;
+            i = 0;
+
+            foreach (var trip in candidateTripsReturn)
+            {
+                var r = "";
+                var stops = trip.stopList.Count() - 2;
+
+                @*if (trip.Entertainment)
+                    {
+                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-play-64.png" class="imgDisplay" style="width:18px;height:18px" />
+                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-play-64.png" class="imgDisplay" style="width:18px;height:18px" />
+                    }*@
+                <div>
+                    <!--margin-left用来调整scrollable与内部elements的空隙-->
+                    <div class="panel panel-default" style="margin-left:0px">
+                        <div class="panel-body" style="padding:3px">
+                            <div id=@depId ; name="returnOptions" style="display: none;">
+                                @foreach (var route in trip.RouteList)
+                                {
+                                    r = r + route + " ";
+                                }
+                                @r
+                            </div>
+                            <div style="width:150px;margin-left:0px;float:left">
+                                <div>
+                                    @trip.stopList.First()
+                                    @*@trip.stopList.SkipWhile(s => s != @trip.stopList.First()).Skip(1).First()*@
+                                </div>
+                                <div>
+                                    @trip.DepartTime
+                                </div>
+                                <div>
+                                    <a name="Amenities" style="cursor:pointer">@Localizer["Amenity details"]</a>
+                                </div>
+                                <div>
+                                    @stops @Localizer["stops"]
+                                </div>
+                            </div>
+                            <div class="pull-right" style="width:150px;float:left">
+                                <div class="pull-right">@trip.stopList.Last()</div>
+                                <div>
+                                    <div>
+                                        Arrive:
+                                    </div>
+                                    <div>
+                                        @trip.ArrivetTime
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        TotalPrice:$
+                                    </span>
+                                    <span id=@depId ; name="returnOptions">
+                                        @trip.TotalPrice
+                                    </span>
+                                    <span>
+                                        <button id=@depId ; name="returnOptions" type="button" class="btn btn-warning pull-right">@Localizer["Book return"]</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer" style="padding: 3px; display:none">
+                            @foreach (var stop in trip.stopList)
+                            {
+                                if (stop == @trip.stopList.Last())
+                                {
+                                    break;
+                                }
+                                <div style="height:auto; border:1px solid black; padding: 2px; margin-top:2px">
+                                    <div>
+                                        <span>@stop</span>
+                                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-chevron-right-48.png" class="imgDisplay" style="width:18px;height:18px" />
+                                        <span class="label label-info">
+                                            <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-airplane-mode-on-24.png" class="imgDisplay" style="width:15px;height:15px" />
+                                            <span style="font-size: 10px">@trip.AirCraftModelList.ElementAt(i)</span>
+                                        </span>
+                                        <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-chevron-right-48.png" class="imgDisplay" style="width:18px;height:18px" />
+                                        <span>@trip.stopList.SkipWhile(s => s != stop).Skip(1).First()</span>
+                                    </div>
+                                    <div>
+                                        <div>
+                                            <span class="label label-default">Flight code:</span>
+                                            @trip.AirlineCodeList.ElementAt(i)
+                                            <span class="label label-default">Amenities:</span>
+                                            @if (trip.EntertainmentList.ElementAt(i))
+                                            {
+                                                <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-play-64.png" class="imgDisplay" style="width:12px;height:12px" />
+                                            }
+                                            @if (trip.WiFiList.ElementAt(i))
+                                            {
+                                                <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-wi-fi-connected-32.png" class="imgDisplay" style="width:12px;height:12px" />
+                                            }
+                                            @if (trip.ACPowerList.ElementAt(i++)) //单次循环(foreach (var trip in candidateTrips))中的最后一个i要进行i++,以确保循环到下一个flight schedule时不会显示重复的内容
+                                            {
+                                                <img src="~/ViewLibaries/HomeSearch/Images/Amenities/icons8-electrical-30.png" class="imgDisplay" style="width:12px;height:12px" />
+                                            }
+                                        </div>                                       
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                depId++;
+                i = 0; //将当前航线panel的amenities的循环清零
+            }
+        }
+    </div>
+</div>

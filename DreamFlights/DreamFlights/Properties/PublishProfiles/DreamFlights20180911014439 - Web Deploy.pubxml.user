@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAWpxzZcn+KUKrPfM+pP/jawAAAAACAAAAAAAQZgAAAAEAACAAAAAJu1our0Ab3N5HJqm39W52BANSgESxl9Pp0iqubu/IewAAAAAOgAAAAAIAACAAAABu2XthtjpGZcm4FSOvHy3nNczBTfyO0G84NS7z38CUz4AAAAACz3ibmBmLSLiU++Izc/uXti2n6bqyc0qAXJ6KDvKIwR4RyYp2kIw6wd8BLo9JhFdiY45klqJWRo6Og3uRGoYLBbVWrth61cp5+GIHcZxSG42nwdgk1If/2sflyHLEMjCShZUxFA2eNtgPJ0dcPJX7IAPP7n2MZbqT/xBmzPTSrkAAAAC0ESVkue5hMPEUoZ+1m4XW0vKIw8je2iF0CJWyqv3dcWAdW+kyaYRG6H86rEekv8jV3pplYSoCLtA9FJXVhOA/</EncryptedPassword>
+  </PropertyGroup>
+  <ItemGroup>
+    <AzureDBConnectionStrings Include="Data Source=tcp:dreamflights20180911014439dbserver.database.windows.net,1433;Initial Catalog=DreamFlights20180911014439_db1;User Id=shikeDre@dreamflights20180911014439dbserver;Password=sksksksk135951!" />
+    <AzureDBConnectionStrings Include="Data Source=tcp:dreamflights20180911014439dbserver.database.windows.net,1433;Initial Catalog=DreamFlights20180911014439_db;User Id=shikeDre@dreamflights20180911014439dbserver;Password=sksksksk135951!" />
+  </ItemGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Data Source=tcp:dreamflights20180911014439dbserver.database.windows.net,1433%3bInitial Catalog=DreamFlights20180911014439_db1%3bUser Id=shikeDre%40dreamflights20180911014439dbserver%3bPassword=sksksksk135951!</Value>
+    </DestinationConnectionStrings>
+    <DestinationConnectionStrings Include="FlightConnection">
+      <Value>Data Source=tcp:dreamflights20180911014439dbserver.database.windows.net,1433%3bInitial Catalog=DreamFlights20180911014439_db1%3bUser Id=shikeDre%40dreamflights20180911014439dbserver%3bPassword=sksksksk135951!</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="DreamFlights.Data.ApplicationDbContext">
+      <Value>Data Source=tcp:dreamflights20180911014439dbserver.database.windows.net,1433%3bInitial Catalog=DreamFlights20180911014439_db1%3bUser Id=shikeDre%40dreamflights20180911014439dbserver%3bPassword=sksksksk135951!</Value>
+    </EFMigrations>
+    <EFMigrations Include="DreamFlights.Data.FlightContext">
+      <Value>Data Source=tcp:dreamflights20180911014439dbserver.database.windows.net,1433%3bInitial Catalog=DreamFlights20180911014439_db1%3bUser Id=shikeDre%40dreamflights20180911014439dbserver%3bPassword=sksksksk135951!</Value>
+    </EFMigrations>
+  </ItemGroup>
+</Project>

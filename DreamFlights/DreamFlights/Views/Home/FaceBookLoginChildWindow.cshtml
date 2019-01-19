@@ -1,0 +1,36 @@
+﻿
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "FaceBookLoginChildWindow";
+}
+
+<body onload="closeWindow()">
+
+    <script>
+        function closeWindow() {
+            document.forms['member_signup'].submit();
+        }
+    </script>
+
+
+
+    <form id="searchForm222" asp-area="Identity" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@ViewBag.ReturnUrl" method="post" class="form-horizontal" name="member_signup">
+        <div class="col-md-1 col-md-offset-1">
+            <p>
+                @foreach (var provider in ViewBag.ExternalLogins)
+                {
+                    if (@provider.Name == "Google")
+                    {
+                        <button type="submit" class="btn btn-default" style="width:200px;display:none" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                            <img src="~/images/icons8-facebook-48.png" class="pull-left" style="width:23px;height:23px;" />@provider.DisplayName
+                        </button>
+                    }
+                }
+            </p>
+            <input name="provider" value="Google" type="text" class="form-control">
+        </div>
+    </form>
+
+</body>

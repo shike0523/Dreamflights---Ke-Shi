@@ -1,0 +1,46 @@
+﻿@model DreamFlights.Models.Route
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<p style="color: red">@ViewBag.constrainError</p>
+<div>
+    <h4>Route</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BasicFare)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BasicFare)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FromCity)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FromCity.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ToCity)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ToCity.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AveDuration)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AveDuration)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="RouteID" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

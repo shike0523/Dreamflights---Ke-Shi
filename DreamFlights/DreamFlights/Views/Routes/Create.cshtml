@@ -1,0 +1,73 @@
+﻿@model DreamFlights.Models.Route
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<script>
+    var idleTime = 0;
+    $(document).ready(function () {
+        //Increment the idle time counter every minute.
+        var idleInterval = setInterval(timerIncrement, 1000); // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间
+        //var idleIntervalReload = setInterval(timerIncrementReload, 1500);
+
+        //Zero the idle timer on mouse movement.
+        $(this).mousemove(function (e) {
+            idleTime = 0;
+        });
+        $(this).keypress(function (e) {
+            idleTime = 0;
+        });
+    });
+
+    // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间;每隔1秒都检查一次无操作时间是否到达5秒,如果到达了就刷新一次页面
+    function timerIncrement() {
+        idleTime = idleTime + 1;
+        if (idleTime > 25) { // 25 seconds
+            window.location.reload();
+        } else if (idleTime === 1) {
+            $.ajax({
+                    url: '@Url.Action("Validate", "Flight_Schedule")',  // 生成一个url,表示跳转到控制器下”Approver”下的"Validate"方法
+                    type: "post"
+             });
+        }
+    }
+</script>
+
+<h4>Route</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FromCityID" class="control-label"></label>
+                <select asp-for="FromCityID" class ="form-control" asp-items="ViewBag.FromCityID"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ToCityID" class="control-label"></label>
+                <select asp-for="ToCityID" class ="form-control" asp-items="ViewBag.ToCityID"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="BasicFare" class="control-label"></label>
+                <input asp-for="BasicFare" class="form-control" />
+                <span asp-validation-for="BasicFare" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AveDuration" class="control-label"></label>
+                <input asp-for="AveDuration" class="form-control" />
+                <span asp-validation-for="AveDuration" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

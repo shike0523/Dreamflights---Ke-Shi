@@ -1,0 +1,80 @@
+﻿@model DreamFlights.Models.City
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<script>
+    var idleTime = 0;
+    $(document).ready(function () {
+        //Increment the idle time counter every minute.
+        var idleInterval = setInterval(timerIncrement, 1000); // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间
+        //var idleIntervalReload = setInterval(timerIncrementReload, 1500);
+
+        //Zero the idle timer on mouse movement.
+        $(this).mousemove(function (e) {
+            idleTime = 0;
+        });
+        $(this).keypress(function (e) {
+            idleTime = 0;
+        });
+    });
+
+    // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间;每隔1秒都检查一次无操作时间是否到达5秒,如果到达了就刷新一次页面
+    function timerIncrement() {
+        idleTime = idleTime + 1;
+        if (idleTime > 25) { // 25 seconds
+            window.location.reload();
+        } else if (idleTime === 1) {
+            $.ajax({
+                    url: '@Url.Action("Validate", "Flight_Schedule")',  // 生成一个url,表示跳转到控制器下”Approver”下的"Validate"方法
+                    type: "post"
+             });
+        }
+    }
+</script>
+
+<h4>City</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="CityID" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AirportName" class="control-label"></label>
+                <input asp-for="AirportName" class="form-control" />
+                <span asp-validation-for="AirportName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PostCode" class="control-label"></label>
+                <input asp-for="PostCode" class="form-control" />
+                <span asp-validation-for="PostCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StateOrTerritory" class="control-label"></label>
+                <select asp-for="StateOrTerritory" class="form-control" asp-items="Html.GetEnumSelectList<StateOrTerritory>()"></select>
+                <span asp-validation-for="StateOrTerritory" class="text-danger"></span>
+            </div>
+            <div class="form-group">                
+                <input type="hidden" asp-for="State" class="form-control" />
+                <span asp-validation-for="State" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

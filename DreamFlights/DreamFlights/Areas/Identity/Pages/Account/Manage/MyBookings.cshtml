@@ -1,0 +1,43 @@
+﻿@page
+@model MyBookingsModel
+@{
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Personal ID
+            </th>
+            <th>
+                Booking Time
+            </th>
+            <th>
+                From
+            </th>
+            <th>
+                To
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.BookingTransaction)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PersonalID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookingDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Flight_Schedule.Route.FromCity.Name) : @Html.DisplayFor(modelItem => item.DepartDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Flight_Schedule.Route.ToCity.Name) : @Html.DisplayFor(modelItem => item.Flight_Schedule.ArriveDateTime)
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

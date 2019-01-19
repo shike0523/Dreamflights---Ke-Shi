@@ -1,0 +1,22 @@
+﻿<h2>ExternalLoginSuceed</h2>
+@* 该标题是作为登陆成功的标记,不可删除,详见"LoginNonChildWindow.cshtml"(...result.startsWith("<h2>ExternalLoginSuceed</h2>")) *@
+<h3>Password reset succeeded, please go to home page</h3>
+<a asp-area="" asp-controller="Home" asp-action="Index">Home Page</a>
+@{
+    ViewData["Title"] = "Log in";
+    Layout = null;
+}
+<script>
+    function closeWindow() {
+        //close();
+        setTimeout(window.close, 300);
+    }
+</script>
+<html>
+<!--页面加载后执行的函数-->
+<body onload="closeWindow()">
+
+
+
+</body>
+</html>

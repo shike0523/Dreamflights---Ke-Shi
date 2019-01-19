@@ -1,0 +1,411 @@
+﻿@model IEnumerable<DreamFlights.Models.Flight_Schedule>
+
+@{
+    ViewData["Title"] = "Book";
+}
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+<h2>Book</h2>
+
+<div>Your cabin: @ViewBag.cabin</div>
+
+<link href="~/CardPayment/css/styles.css" rel="stylesheet" />
+
+
+<script src="~/ViewLibaries/HomeIndex/LanguageSelect/LanguageTranslate.js"></script>
+
+<p>
+    Your tour:
+</p>
+
+<script>
+    $(document).ready(function () {
+        //$("input[id='1'][name='Last Name']").val("出发 预定");
+        //var aaa = $("div[name='passenger']").length - 1;
+        //var bbb = $("div[name='passenger']");
+        ////alert(bbb[1].id);
+        //$("input[id=" + aaa + "][name='First Name']").val("出发 预定");
+        var validated = true;
+        $("#confirmBooking").click(function () {
+            var noEmailSignal = true;
+            $("div[name='passenger']").each(function () {
+                //注:是“this.id”而不是“$(this).id”
+                if ($("input[id=" + this.id + "][name='lastName']").val() === "") {
+                    $("input[id=" + this.id + "][name='lastName']").next().html(TranslateLanguage("Last name is required!", "要写！"));
+                    validated = false;
+                    //location.href = "#";
+                    //location.href = "#" + this.id + "";
+                    //滚动到输入错误的地方
+                    $('html, body').animate({
+                        scrollTop: $('#' + this.id).offset().top - 50
+                    }, 'slow');
+                } else if ($("input[id=" + this.id + "][name='lastName']").val().length > 35) {
+                    $("input[id=" + this.id + "][name='lastName']").next().html(TranslateLanguage("This name can not be longer than 35 characters!", "不要超过35个字符！"));
+                    validated = false;
+                    //滚动到输入错误的地方
+                    $('html, body').animate({
+                        scrollTop: $('#' + this.id).offset().top - 50
+                    }, 'slow');
+                } else {
+                    //如果输入正确则将错误提示信息清零
+                    $("input[id=" + this.id + "][name='lastName']").next().html("");
+                }
+
+                if ($("input[id=" + this.id + "][name='firstName']").val() === "") {
+                    $("input[id=" + this.id + "][name='firstName']").next().html(TranslateLanguage("First name is required!", "要写！"));
+                    validated = false;
+                    //滚动到输入错误的地方
+                    $('html, body').animate({
+                        scrollTop: $('#' + this.id).offset().top - 50
+                    }, 'slow');
+                } else if ($("input[id=" + this.id + "][name='firstName']").val().length > 35) {
+                    $("input[id=" + this.id + "][name='firstName']").next().html(TranslateLanguage("This name can not be longer than 35 characters!", "不要超过35个字符！"));
+                    validated = false;
+                    //滚动到输入错误的地方
+                    $('html, body').animate({
+                        scrollTop: $('#' + this.id).offset().top - 50
+                    }, 'slow');
+                } else {
+                    $("input[id=" + this.id + "][name='firstName']").next().html("");
+                }
+
+                if ($("input[id=" + this.id + "][name='ID']").val().length <= 6 || $("input[id=" + this.id + "][name='ID']").val() === "") {
+                    $("input[id=" + this.id + "][name='ID']").next().html(TranslateLanguage("ID should be more than 6 digit numbers or characters!", "身份信息不能少于6个数字或者字母！"));
+                    validated = false;
+                    //滚动到输入错误的地方
+                    $('html, body').animate({
+                        scrollTop: $('#' + this.id).offset().top - 50
+                    }, 'slow');
+                } else if ($("input[id=" + this.id + "][name='ID']").val().length > 12) {
+                    $("input[id=" + this.id + "][name='ID']").next().html(TranslateLanguage("ID should not be more than 12 digit numbers or characters!", "身份信息不能超过12个数字或者字母！"));
+                    validated = false;
+                    //滚动到输入错误的地方
+                    $('html, body').animate({
+                        scrollTop: $('#' + this.id).offset().top - 50
+                    }, 'slow');
+                } else {
+                    $("input[id=" + this.id + "][name='ID']").next().html("");
+                }
+
+                if ($("input[id=" + this.id + "][name='email']").val() !== "") {
+                    noEmailSignal = false;
+                }
+            });
+            if (noEmailSignal === true) {
+                $("input[id=" + 0 + "][name='email']").next().html(TranslateLanguage("At least 1 email is required!", "至少要写一个人的邮件箱！"));
+            }
+            if (validated === true && noEmailSignal === false) {
+                $("#confirmBookingForm").submit();
+            }
+            else {
+                //如果验证不成功,则从头再来,将信号变量“validated”回到初始状态
+                validated = true;
+            }
+        });
+    });
+
+</script>
+
+@{
+    List<DreamFlights.Models.Flight_Schedule> departSchedules = ViewBag.departSchedules;
+    List<DreamFlights.Models.Flight_Schedule> returnSchedules = ViewBag.returnSchedules;
+}
+
+@Localizer["Depart"] :
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Localizer["Depart city"]
+            </th>
+            <th>
+                Depart time
+            </th>
+            <th>
+                @Localizer["Arrive city"]
+            </th>
+            <th>
+                Arrive time
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in departSchedules)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Route.FromCity.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DepartDateTime)
+                </td>
+                <td>
+                    arrive: @Html.DisplayFor(modelItem => item.Route.ToCity.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ArriveDateTime)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="alert alert-danger">
+        <strong>Notice:</strong> @Localizer["Seats selection will be in the check-in"]
+    </div>
+</div>
+
+
+@{
+    if (ViewBag.onewayOrReturn == "return")
+    {
+        <div>@Localizer["Return"] :</div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Localizer["Depart city"]
+                    </th>
+                    <th>
+                        Depart time
+                    </th>
+                    <th>
+                        @Localizer["Arrive city"]
+                    </th>
+                    <th>
+                        Arrive time
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in returnSchedules)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Route.FromCity.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DepartDateTime)
+                        </td>
+                        <td>
+                            arrive: @Html.DisplayFor(modelItem => item.Route.ToCity.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ArriveDateTime)
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+
+<form id="confirmBookingForm" name="" asp-action="ConfirmBook">
+    @{
+        int passengerIndex = 0;
+        @for (var i = 0; i < ViewBag.adults; i++)
+        {
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        @Localizer["Adult"] @(i+1)
+                    </div>
+                    <div id=@passengerIndex class="row" name="passenger">
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">@Localizer["Last Name"]:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="lastName">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">@Localizer["First Name"]:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="firstName">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">ID:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="ID">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">Email(at least 1 email):</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="email">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            passengerIndex++;
+        }
+        @for (var i = 0; i < ViewBag.youths; i++)
+        {
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        @Localizer["Youth"] @(i+1)
+                    </div>
+                    <div id=@passengerIndex class="row" name="passenger">
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">@Localizer["Last Name"]:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="lastName">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">@Localizer["First Name"]:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="firstName">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">ID:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="ID">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            passengerIndex++;
+        }
+        @for (var i = 0; i < ViewBag.children; i++)
+        {
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        @Localizer["Child"] @(i+1)
+                    </div>
+                    <div id=@passengerIndex class="row" name="passenger">
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">@Localizer["Last Name"]:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="lastName">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">@Localizer["First Name"]:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="firstName">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="form-group">
+                                <label for="usr">ID:</label>
+                                <input type="text" class="form-control" id=@passengerIndex name="ID">
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            passengerIndex++;
+        }
+    }
+</form>
+
+<center><h2>@Localizer["Total"]: $ @ViewBag.totalPrice</h2></center>
+
+<div class="container-fluid">
+
+    <div class="creditCardForm">
+        <div class="heading">
+            <h1>Confirm Purchase</h1>
+        </div>
+        <div class="payment">
+            <form>
+                <div class="form-group owner">
+                    <label for="owner">Owner</label>
+                    <input type="text" class="form-control" id="owner">
+                </div>
+                <div class="form-group CVV">
+                    <label for="cvv">CVV</label>
+                    <input type="text" class="form-control" id="cvv">
+                </div>
+                <div class="form-group" id="card-number-field">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" class="form-control" id="cardNumber">
+                </div>
+                <div class="form-group" id="expiration-date">
+                    <label>Expiration Date</label>
+                    <select>
+                        <option value="01">January</option>
+                        <option value="02">February </option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <select>
+                        <option value="16"> 2016</option>
+                        <option value="17"> 2017</option>
+                        <option value="18"> 2018</option>
+                        <option value="19"> 2019</option>
+                        <option value="20"> 2020</option>
+                        <option value="21"> 2021</option>
+                    </select>
+                </div>
+                <div class="form-group" id="credit_cards">
+                    <img src="~/CardPayment/images/amex.jpg" />
+                    <img src="~/CardPayment/images/mastercard.jpg" />
+                    <img src="~/CardPayment/images/visa.jpg" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="pull-right" style="margin-right:100px">
+    <button id="confirmBooking" type="button" class="btn btn-danger">Confirm booking</button>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="myModalLogin" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 380px;">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                @*<button id="loginSubmit" class="btn btn-default">Log in</button>*@
+                <partial name="_LoginPartialNonChildWindow" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close!</button>
+            </div>
+        </div>
+
+    </div>
+</div>

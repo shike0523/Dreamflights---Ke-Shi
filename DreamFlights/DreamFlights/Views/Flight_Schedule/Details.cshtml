@@ -1,0 +1,81 @@
+﻿@model DreamFlights.Models.Flight_Schedule
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Flight_Schedule</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            Depart 
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Route.FromCity.Name)
+        </dd>
+        <dt>
+            Arrive
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Route.ToCity.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DepartDateTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DepartDateTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ArriveDateTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ArriveDateTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Economy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Economy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Business)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Business)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PremEconomy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PremEconomy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.First)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.First)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Route)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Route.RouteID)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AirCraft)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AirCraft.AirCraftID)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Flight_ScheduleID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+<a>@ViewBag.Date</a>

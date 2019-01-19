@@ -1,0 +1,650 @@
+﻿
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+
+<link href="~/ViewLibaries/HomeIndex/Logo/StyleSheet.css" rel="stylesheet" />
+
+<link href="~/ViewLibaries/HomeIndex/Calender/calendar2.css" rel="stylesheet" />
+<script src="~/ViewLibaries/HomeIndex/Calender/calendarCode2.js"></script>
+<script src="~/ViewLibaries/HomeIndex/LanguageSelect/LanguageTranslate.js"></script>
+
+
+<style>
+    body {
+        background-color: Highlight
+    }
+
+    .scaled {
+        -ms-transform: scale(1); /* IE 9 */
+        -webkit-transform: scale(1); /* Safari */
+        transform: scale(1); /* Standard syntax */
+    }
+
+    /* 使其里面的元素总体置中 */
+    .containerStack {
+        margin-top: -15px;
+        width: 500px;
+        height: 70px;
+        position: fixed;
+        /* center the element */
+        right: 0;
+        left: 0;
+        /* horizontally and vertically center */
+        margin-right: auto;
+        margin-left: auto;
+        /* 调整垂直位置(以百分比来计算,调整top参数即可) */
+        top: 50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        z-index: 5;
+        display: none;
+    }
+
+    .imgCenter {
+        margin-top: -100px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        z-index: 5;
+    }
+
+    /* 暗色半透明背景 */
+    #calenderOverlay {
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 2;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        if ('@(ViewBag.SessionTimeout)' === "SessionTimeout") {
+            if ($("#languageSelect").val() === "zh") {
+                alert("操作超时(时限仅有45秒, 是为了方便用人单位测试这个功能)!!!");
+            } else {
+                alert("Session Timeout(only 45s, for easy inspection from employers)!!!");
+            }          
+        }
+
+        //Animated Logo
+        $("#smoke").show();
+        $("#jet").show();
+        $(".masked").css("animation-play-state", "running");
+        $("#jet").css("animation-play-state", "running");
+
+        //Cookie预先绑定输入值
+        var cabinselected = '@(ViewBag.cabin)';
+        $("div.Adults select").val(@ViewBag.adults);
+        $("div.Youths select").val(@ViewBag.youths);
+        $("div.Children select").val(@ViewBag.children);
+        //ViewBag.cabin两边要加引号,不然JS无法正确运行
+        $("div.Cabin select").val(cabinselected);
+
+        //Calendar button&return/oneway
+        $("#return").click(function () {
+            $("#showdateReturn-group").show();
+            $("#return-panel").show();
+            oneway = 0;
+        });
+        $("#oneway").click(function () {
+
+            $("#showdateReturn-group").hide();
+            $("#return-panel").hide();
+            oneway = 1;
+            clickCount = 0;
+        });
+        $("button:contains('Previous')").click(function () {
+            subMonth();
+        });
+        $("button:contains('Next')").click(function () {
+            addMonth();
+        });
+
+        $("#Reset").click(function () {  //重置日历
+            clickCount = 0;
+            clickDay = 0;
+            clickDay2 = 0;
+            $("#showdateReturn-panel").val("");
+            $("#showdate-panel").val("");
+            rili();
+            $("#tip-panel").html("Please select a depart date");
+        });
+
+        /*日历空心箭头的变色函数vvvv*/
+        $("#arrow-hollow").hover(function () {
+            $('#arrow-hollow').append("<style>#arrow-hollow:before { border-left-color: red; }</style>");
+        }).mouseout(function () {
+            $('#arrow-hollow').append("<style>#arrow-hollow:before { border-left-color: blue; }</style>");
+        });
+        $("#cal-pre").hover(function () {
+            $('#arrow-hollowR').append("<style>#arrow-hollowR:before { border-right-color: red; }</style>");
+            $('#arrow-hollowR').append("<style>#arrow-hollowR:after { border-right-color: #286090; }</style>");
+            $(this).css("background-color", "#286090");
+        }).mouseout(function () {
+            $('#arrow-hollowR').append("<style>#arrow-hollowR:before { border-right-color: blue; }</style>");
+            $('#arrow-hollowR').append("<style>#arrow-hollowR:after { border-right-color: #337ab7; }</style>");
+            $(this).css("background-color", "#337ab7");
+        }).mousedown(function () {
+            $(this).css("background-color", "#204d74");
+            $('#arrow-hollowR').append("<style>#arrow-hollowR:after { border-right-color: #204d74; }</style>");
+        }).mouseup(function () {
+            $(this).css("background-color", "#286090");
+            $('#arrow-hollowR').append("<style>#arrow-hollowR:after { border-right-color: #286090; }</style>");
+        });
+        $("#cal-next").hover(function () {
+            $('#arrow-hollow').append("<style>#arrow-hollow:before { border-left-color: red; }</style>");
+            $('#arrow-hollow').append("<style>#arrow-hollow:after { border-left-color: #286090; }</style>");
+            $(this).css("background-color", "#286090");
+        }).mouseout(function () {
+            $('#arrow-hollow').append("<style>#arrow-hollow:before { border-left-color: blue; }</style>");
+            $('#arrow-hollow').append("<style>#arrow-hollow:after { border-left-color: #337ab7; }</style>");
+            $(this).css("background-color", "#337ab7");
+        }).mousedown(function () {
+            $(this).css("background-color", "#204d74");
+            $('#arrow-hollow').append("<style>#arrow-hollow:after { border-left-color: #204d74; }</style>");
+        }).mouseup(function () {
+            $(this).css("background-color", "#286090");
+            $('#arrow-hollow').append("<style>#arrow-hollow:after { border-left-color: #286090; }</style>");
+        });
+       /*日历空心箭头的变色函数^^^^^^*/
+
+        //From and To; submit city id; display city name.
+        var fromHidden = "";       //用于暂时存放弹出列表中的第一个city的id
+        var fromHiddenName = "";   //用于暂时存放弹出列表中的第一个city的name
+        var toHidden = "";
+        var toHiddenName = "";
+        $("#FromCity").autocomplete({
+            source: function (request, response) {
+                fromHidden = "";
+                $.ajax({
+                    url: '@Url.Action("GetCityNameAuto", "Home")',
+                    type: "post",
+                    dataType: "json",
+                    data: { Prefix: request.term },
+                    dataFilter: function (data) {
+                        return data;
+                    },
+                    success: function (data) {
+                        $("#FromCityIdHidden").val("");
+                        response($.map(data, function (item) {
+                            if (fromHidden === "") {    //为空表示当前item是autocomplete弹出列表的第一个值,因此此时将cityID和name都存入暂存变量中
+                                fromHidden = item.cityID;
+                                fromHiddenName = item.name + " " + item.state;
+                            }
+                            return {
+                                label: item.name + " " + item.state,
+                                value: item.cityID
+                            };
+                        }))
+                    }
+                });
+            },
+            select: function (event, ui) {
+                $("#FromCity").val(ui.item.label);
+                $("#FromCityIdHidden").val(ui.item.value);
+                //FromCityID = ui.item.name;
+                return false;
+            },
+            close: function (event, ui) {
+                //防止客户在正常点选autocomplete中的地名后任然执行以下不该执行的代码;"#FromCityIdHidden"为空表示客户尚未选择一个地名点选一个city而是将鼠标点击到了其他地方或是客户自己删掉了input中的地名;
+                if ($("#FromCityIdHidden").val() === "") {
+                    //$("#FromCity").val()不为空则表示订票者没有点选一个city而是将鼠标点击到了其他地方,此时则将"暂存变量"中autocomplete弹出列表的第一个值存入对应表单(存储于fromHiddenName中);如果为空,则说明是客户自己删掉了input中的地名
+                    if ($("#FromCity").val() !== "") {
+                        $("#FromCity").val(fromHiddenName);
+                        $("#FromCityIdHidden").val(fromHidden);
+                    }
+                }
+                fromHidden = "";
+            },
+            minLength: 1,
+        });
+        $("#ToCity").autocomplete({
+            source: function (request, response) {
+                fromHidden = "";
+                $.ajax({
+                    url: '@Url.Action("GetCityNameAuto", "Home")',  // 生成一个url,表示跳转到控制器下”Home”下的"HelloAjax"方法
+                    type: "post",
+                    dataType: "json",
+                    data: { Prefix: request.term },
+                    dataFilter: function (data) {
+                        return data;
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            if (toHidden === "") {
+                                toHidden = item.cityID;
+                                toHiddenName = item.name + " " + item.state;
+                            }
+                            $("#ToCityIdHidden").val("");
+                            return {
+                                label: item.name + " " + item.state,
+                                value: item.cityID
+                            };
+                        }))
+                    }
+                });
+            },
+            select: function (event, ui) {
+                $("#ToCity").val(ui.item.label);
+                $("#ToCityIdHidden").val(ui.item.value);
+                //FromCityID = ui.item.name;
+                return false;
+            },
+            close: function (event, ui) {
+                if ($("#ToCityIdHidden").val() === "") {
+                    if ($("#ToCity").val() !== "") {
+                        $("#ToCity").val(toHiddenName);
+                        $("#ToCityIdHidden").val(toHidden);
+                    }
+                }
+                toHidden = "";
+            },
+            minLength: 1,
+        });
+
+        $("#test").click(function () {
+            if ($("#FromCityIdHidden").val() === "" || $("#ToCityIdHidden").val() === "") {
+                alert("Please input a correct city name!");
+            } else if ($("#showdate").val() === "") {
+                alert("Please input date!");
+            } else if ($("#adults").val() === "" && $("#youths").val() === "" && $("#children").val() === "") {
+                alert("Please input people!");
+            } else if ($("#cabin").val() === "") {
+                alert("Please input cabin!");
+            } else {
+                //Covert data format to suit different cultures
+                var data = $("#showdate").val();
+                var arr = data.split('/');
+                if (arr[1].startsWith("0")) {
+                    arr[1] = arr[1].charAt(1);
+                }
+
+                //added for Azure:
+                if (arr[0].startsWith("0")) {
+                    arr[0] = arr[0].charAt(1);
+                }
+
+                //Change the format of date according to the selected culture
+                var newdate;
+                //var newdate = arr[1] + '/' + arr[0] + '/' + arr[2];
+                if ($("#languageSelect").val() === "zh") {
+                    //swapped for zh
+                    newdate = arr[0] + '/' + arr[1] + '/' + arr[2];
+                } else if ($("#languageSelect").val() === "en-AU") {
+                    if (arr[1].length === 1) {
+                        arr[1] = "0" + arr[1];
+                    }
+                    newdate = arr[0] + '/' + arr[1] + '/' + arr[2];
+                }
+                $("#showdate").val(newdate);
+                if ($("#return").is(':checked')) {
+                    ConvertDateReturn();
+                }                
+
+                //显示读取提示标记
+                document.getElementById("calenderOverlay").style.display = "block";
+                var panel = document.getElementsByClassName("containerStack");
+                panel[0].style.display = "block";
+
+                $("#searchForm").submit();
+            }
+        });
+
+        //Covert return date data format to suit different cultures
+        function ConvertDateReturn() {
+            //Covert data format to suit different cultures
+            var data = $("#showdateReturn").val();
+            var arr = data.split('/');
+            if (arr[1].startsWith("0")) {
+                arr[1] = arr[1].charAt(1);
+            }
+
+            //added for Azure:
+            if (arr[0].startsWith("0")) {
+                arr[0] = arr[0].charAt(1);
+            }
+
+            //Change the format of date according to the selected culture
+            var newdate;
+            //var newdate = arr[1] + '/' + arr[0] + '/' + arr[2];
+            if ($("#languageSelect").val() === "zh") {
+                //swapped for zh
+                newdate = arr[0] + '/' + arr[1] + '/' + arr[2];
+            } else if ($("#languageSelect").val() === "en-AU") {
+                if (arr[1].length === 1) {
+                    arr[1] = "0" + arr[1];
+                }
+                newdate = arr[0] + '/' + arr[1] + '/' + arr[2];
+            }
+            $("#showdateReturn").val(newdate);
+        }
+    });
+
+
+    $(function () {
+        var d = new Date();
+
+        var dateFormat = "mm/dd/yy",
+            from = $("#datepicker")
+                .datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    minDate: new Date(d.getFullYear(), d.getMonth(), d.getDate()),
+                    maxDate: new Date(d.getFullYear(), d.getMonth() + 3, d.getDate()),
+                    numberOfMonths: 3
+                })
+                .on("change", function () {
+                    to.datepicker("option", "minDate", getDate(this));
+                }),
+            to = $("#datepicker2").datepicker({
+                defaultDate: "+1w",
+                changeMonth: true,
+                numberOfMonths: 3
+            })
+                .on("change", function () {
+                    from.datepicker("option", "maxDate", getDate(this));
+                });
+
+        function getDate(element) {
+            var date;
+            try {
+                date = $.datepicker.parseDate(dateFormat, element.value);
+            } catch (error) {
+                date = null;
+            }
+
+            return date;
+        }
+    });
+</script>
+
+<h1 align="center" style="margin-top:-30px">
+    <img src="~/ViewLibaries/HomeIndex/Logo/Images/Logo.png" width="472" height="264" />
+</h1>
+
+<!--//Animated Logo-->
+<div align="center" style="height:10px;margin-top:-140px">
+    <div class="masked" id="smoke" style="height:5px;z-index:2;width:600px;display:none">
+    </div>
+    <div id="jet" style="z-index:3;margin-top:-30px;margin-left:-600px;position:relative;display:none">
+        <img src="~/ViewLibaries/HomeIndex/Logo/Images/jet.png" style="width:50px;height:50px;" />
+    </div>
+</div>
+
+<h3>@Localizer["Domestic airline only"]</h3>
+<div style="margin-top:50px">
+    <div class="col-md-8 col-md-offset-3">
+        <form id="searchForm" name="myform2" asp-action="Search">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="row">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="col-md-6">
+                            <!--起点和终点的尺寸-->
+                            <label class="control-label">@Localizer["From"]:</label>
+                            <input id="FromCity" name="FromCityName" class="form-control" value="@(ViewBag.FromCityName ?? String.Empty)" placeholder="Input your origin">
+                            <input type="hidden" id="FromCityIdHidden" name="FromCityID" value="@ViewBag.FromCityID">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="control-label">@Localizer["To"]:</label>
+                            <input id="ToCity" name="ToCityName" class="form-control" value="@(ViewBag.ToCityName ?? String.Empty)" placeholder="Input your destination">
+                            <input type="hidden" id="ToCityIdHidden" name="ToCityID" value="@ViewBag.ToCityID">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" data-toggle="modal" data-target="#myModal">
+                            @Localizer["Depart Date"]:
+                            <div class="input-group" onclick="rili();">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                <input name="startTime" type="text" id=showdate onclick="rili();" class="form-control" placeholder="Input your depart date">
+                            </div>
+                        </div>
+                        <div class="col-md-6" data-toggle="modal" data-target="#myModal">
+                            @Localizer["Return Date"]:
+                            <div class="input-group" onclick="rili();">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                <input name="returnTime" type="text" id=showdateReturn onclick="rili();" class="form-control" placeholder="Input your return date">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 0px 0px 0px 0px">
+                <label for="transmission-standard">return</label>
+                <input type="radio" name="onewayOrReturn" id="return" value="return" checked="checked">
+                <label for="transmission-automatic">oneway</label>
+                <input type="radio" name="onewayOrReturn" id="oneway" value="oneway">
+            </div>
+
+            <div class="row">
+                <div class="Adults" style="padding: 0px 10px 10px;width:90px;float:left">
+                    <label>@Localizer["Adults"]:</label>
+                    <select name="adults" id="adults" class="form-control">
+                        <option value=""></option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                <div class="Youths" style="padding: 0px 10px 10px;width:90px;float:left">
+                    <label>@Localizer["Youths"]:</label>
+                    <select name="youths" id="youths" class="form-control">
+                        <option value=""></option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                <div class="Children" style="padding: 0px 10px 10px;width:90px;float:left">
+                    <label>@Localizer["Children"]:</label>
+                    <select name="children" id="children" class="form-control">
+                        <option value=""></option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                <div class="Cabin" style="padding: 0px 10px 10px;width:120px;float:left">
+                    <label>@Localizer["Cabin class"]:</label>
+                    <select name="cabin" id="cabin" class="form-control" style="width:auto;">
+                        <option value=""></option>
+                        <option value="Economy">Economy</option>
+                        <option value="Business">Business</option>
+                        <option value="PremEconomy">Premium Eco</option>
+                        <option value="First">First</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+            </div>
+        </form>
+    </div>
+</div>
+<h2></h2>
+<div class="row"><div class="col-md-3 col-md-offset-5"><button id="test" value="Searchaaa" class="btn btn-primary btn-block" style="margin-top:20px;margin-left:0px;width:200px">   @Localizer["Search"]   </button></div></div>
+<h2></h2>
+@*<div class="row">
+    <div class="alert alert-danger">
+        <strong>Notice:</strong> Due to the small database capasity of my subscription of Azure server, you can only book 3 months in advance.
+    </div>
+</div>*@
+
+<!-- 模态框（Modal）calendar -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="scaled">
+        <div class="modal-dialog" style="height:800px;width:630px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h5 class="modal-title" id="myModalLabel">
+                        <div id="depart-panel" style="float:left;font-size:1.5em">
+                            Depart date:<input type="text" id="showdate-panel" style="height:36px;width:150px;text-align:center" placeholder="Depart Date:">
+                        </div>
+                        <div id="return-panel" style="float:left;font-size:1.5em">
+                            Return date:<input type="text" id="showdateReturn-panel" style="height:36px;width:150px;text-align:center" placeholder="Return Date:">
+                        </div>
+                    </h5>
+                </div>
+                <div class="modal-body">
+                </div>
+                <table id="caltable" style="margin-left:9px;width: 300px; height: 250px;display:none; float:left">
+                    <!--这里原来里面有个class="Calendar" -->
+                    <thead>
+                        <tr align="center" valign="middle">
+                            <td colspan="7" class="Title">
+                                <button title="上一月" Class="btnM btn-primaryM" id="cal-pre" style="margin-top:-10px;width:100px"><div id="arrow-hollowR" style="margin-left:-12px;width:1px;float:left"></div>Previous</button>
+                                <input name="year" id="year" type="text" size="4" maxlength="4" onblur="setDate();" style="font-size:1.3em;text-align:center"> -
+                                <input name="month" id="month" type="text" size="1" maxlength="2" onblur="setDate();" style="font-size:1.3em;text-align:center;display:none">
+                                <input name="month" id="month-display" type="text" size="1" maxlength="2" onblur="setDate();" style="font-size:1.3em;text-align:center">
+                                <a href="JavaScript:addMonth();" title="下一月" Class="DayButton">Next</a>
+                            </td>
+                        </tr>
+                        <tr align="center" valign="middle">
+                            <Script LANGUAGE="JavaScript">
+                                document.write("<td class=DaySunTitle id=diary onclick='getDiary(this)' style='font-weight:bold;font-size:1.2em;color:red'>" + days[0] + "</td>");
+                                for (var intLoop = 1; intLoop < days.length - 1; intLoop++)
+                                    document.write("<td class=DayTitle id=diary style='font-weight:bold;font-size:1.2em'>" + days[intLoop] + "</td>");
+                                document.write("<td class=DaySatTitle id=diary style='font-weight:bold;font-size:1.2em;color:red'>" + days[intLoop] + "</td>");
+                            </Script>
+                        </tr>
+                    </thead>
+
+
+                    <tbody ID="calendar" ALIGN=CENTER>
+                        <Script LANGUAGE="JavaScript">
+                            for (var intWeeks = 0; intWeeks < 6; intWeeks++) {
+                                document.write("<tr style='cursor:pointer'>");
+                                for (var intDays = 0; intDays < days.length; intDays++) {
+                                    if (intDays == 0 || intDays == 6) {
+                                        //将"onmouseover='buttonOver(this)"改成"onclick='buttonOver(this)"就可以变成适应手机浏览器的模式(点击return day之后round trip中所包含的所有日子都被蓝色高亮显示)
+                                        document.write("<td onmouseover='buttonOver(this)' onmouseout='buttonOut(this)' id=" + riqiid + " style='height:38px;width:38px;background-color:#f5f5e5;opacity:1.0'>a</td>");
+                                    } else {
+                                        document.write("<td onmouseover='buttonOver(this)' onmouseout='buttonOut(this)' id=" + riqiid + " style='height:38px;width:38px'>a</td>");
+                                    }
+                                    riqiid++;
+                                }
+                                document.write("</tr>");
+                            }
+
+                        </Script>
+                    </tbody>
+                </table>
+
+                <table border="0" cellpadding="0" cellspacing="0" id="caltable2" style="margin-left:318px;width: 300px; height: 250px;display:none">
+                    <thead>
+                        <tr align="center" valign="middle">
+                            <td colspan="7" class="Title">
+                                <a href="javaScript:subMonth();" title="上一月" style="margin-left:-15px" Class="DayButton">Previous</a>
+                                <input name="year2" id="year2" type="text" size="4" maxlength="4" onblur="setDate();" style="font-size:1.3em;text-align:center"> -
+                                <input name="month2" id="month2" type="text" size="1" maxlength="2" onblur="setDate();" style="font-size:1.3em;text-align:center;display:none">
+                                <input name="month2" id="month2-display" type="text" size="1" maxlength="2" onblur="setDate();" style="font-size:1.3em;text-align:center">
+                                <button title="上一月" Class="btnM btn-primaryM" id="cal-next" style="margin-top:-10px;width:100px"><div id="arrow-hollow" style="margin-left:62px;width:1px"></div>Next</button>
+                            </td>
+                        </tr>
+                        <tr align="center" valign="middle">
+                            <Script LANGUAGE="JavaScript">
+                                document.write("<td id=diary2 onclick='getDiary(this)' style='font-weight:bold;font-size:1.2em;color:red'>" + days[0] + "</td>");
+                                for (var intLoop = 1; intLoop < days.length - 1; intLoop++)
+                                    document.write("<td id=diary2 style='font-weight:bold;font-size:1.2em'>" + days[intLoop] + "</td>");
+                                document.write("<td id=diary2 style='font-weight:bold;font-size:1.2em;color:red'>" + days[intLoop] + "</td>");
+                            </Script>
+                        </tr>
+                    </thead>
+
+
+                    <tbody border="0" cellspacing="0" cellpadding="0" ID="calendar" ALIGN=CENTER>
+                        <Script LANGUAGE="JavaScript">
+                            for (var intWeeks = 0; intWeeks < 6; intWeeks++) {
+                                document.write("<tr style='cursor:pointer'>");
+                                for (var intDays = 0; intDays < days.length; intDays++) {
+                                    if (intDays == 0 || intDays == 6) {
+                                        //将"onmouseover='buttonOver(this)"改成"onclick='buttonOver(this)"就可以变成适应手机浏览器的模式(点击return day之后round trip中所包含的所有日子都被蓝色高亮显示)
+                                        document.write("<td onmouseover='buttonOver(this)' onmouseout='buttonOut(this)' id=" + riqiid + " style='height:38px;width:38px;background-color:#f5f5e5;opacity:1.0'>a</td>");
+                                    } else {
+                                        document.write("<td onmouseover='buttonOver(this)' onmouseout='buttonOut(this)' id=" + riqiid + " style='height:38px;width:38px'>a</td>");
+                                    }
+
+                                    riqiid++;
+                                }
+                                document.write("</tr>");
+                            }
+                            oneway = 0;
+                        </Script>
+                    </tbody>
+                </table>
+                <div class="modal-footer">
+                    <span id="tip-panel" style="margin-right:75px;font-size:1.5em;font-weight:bold"></span>
+                    <button type="button" id="Reset" class="btn btn-warning">
+                        @Localizer["Reset"]
+                    </button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">
+                        @Localizer["Confirm Date"]
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div>
+    </div><!-- /.modal -->
+</div>
+<!-- 模态框（Modal）calendar -->^
+
+@*读取提示标记*@
+<div id="calenderOverlay" onclick="closeLogin()">
+
+</div>
+<!-- 等待读取提示 -->
+<div class="containerStack"><img class="imgCenter" src="~/ViewLibaries/HomeIndex/Loading/images/Spinner-1s-200px.gif" /></div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModalLogin" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 380px;">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Login in</h4>
+            </div>
+            <div class="modal-body">
+                @*<button id="loginSubmit" class="btn btn-default">Log in</button>*@
+                <partial name="_LoginPartialNonChildWindow" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close!</button>
+            </div>
+        </div>
+
+    </div>
+</div>

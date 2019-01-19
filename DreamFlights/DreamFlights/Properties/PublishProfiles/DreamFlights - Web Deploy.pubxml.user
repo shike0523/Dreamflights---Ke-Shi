@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAXV7f8I3UNE60Xi05UvDxcwAAAAACAAAAAAAQZgAAAAEAACAAAACC7ftLB8VoCnE7OvsvA7U1DYcEjZDRRvcNYvHN2bf3igAAAAAOgAAAAAIAACAAAAC3GJHHQ4k+IcCKKTAfRuh/5oeEjDHv2Fh0S2RKL3xUKYAAAABPJy5+G5l7HfWGERGU0N0MBK3RGn/3bC+bVXEzN56H0A8RCe0UQqHnxS5N5vfR7R6Q0xLVdWS8pYa1XWb/YWBwoDY2/rO6UAePxylZkQBEcQJYBzpOCl9P9kPOe8nWO1V3zwUR7QgqkTQlR1uPiEVhG5bCaJq+j0i5u1YM8jCtcEAAAABJwBdYeoy7CIok4GWJVqghQpN3h6hQWhwg8xHmLXjtQHNu3zTn+7Ctb6SZyvMAcYo4NRE6buIFXU2eidjyW11P</EncryptedPassword>
+  </PropertyGroup>
+  <ItemGroup>
+    <AzureDBConnectionStrings Include="Data Source=tcp:dreamflightsdbserver.database.windows.net,1433;Initial Catalog=DreamFlights_db1;User Id=ShikeDB@dreamflightsdbserver;Password=Shike123!" />
+    <AzureDBConnectionStrings Include="Data Source=tcp:dreamflightsdbserver.database.windows.net,1433;Initial Catalog=DreamFlights_db;User Id=ShikeDB@dreamflightsdbserver;Password=Shike123!" />
+  </ItemGroup>
+</Project>

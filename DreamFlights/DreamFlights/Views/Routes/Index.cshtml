@@ -1,0 +1,83 @@
+﻿@model IEnumerable<DreamFlights.Models.Route>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<script>
+    var idleTime = 0;
+    $(document).ready(function () {
+        //Increment the idle time counter every minute.
+        var idleInterval = setInterval(timerIncrement, 1000); // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间
+        //var idleIntervalReload = setInterval(timerIncrementReload, 1500);
+
+        //Zero the idle timer on mouse movement.
+        $(this).mousemove(function (e) {
+            idleTime = 0;
+        });
+        $(this).keypress(function (e) {
+            idleTime = 0;
+        });
+    });
+
+    // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间;每隔1秒都检查一次无操作时间是否到达5秒,如果到达了就刷新一次页面
+    function timerIncrement() {
+        idleTime = idleTime + 1;
+        if (idleTime > 25) { // 25 seconds
+            window.location.reload();
+        } else if (idleTime === 1) {
+            $.ajax({
+                    url: '@Url.Action("Validate", "Flight_Schedule")',  // 生成一个url,表示跳转到控制器下”Approver”下的"Validate"方法
+                    type: "post"
+             });
+        }
+    }
+</script>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BasicFare)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FromCity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ToCity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AveDuration)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BasicFare)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FromCity.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ToCity.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AveDuration)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.RouteID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.RouteID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.RouteID" asp-route-id2="222">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

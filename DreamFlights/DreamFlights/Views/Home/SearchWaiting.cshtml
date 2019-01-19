@@ -1,0 +1,30 @@
+﻿
+@{
+    ViewData["Title"] = "SearchWaiting";
+}
+
+<h2>SearchWaiting</h2>
+
+<style>
+    .imgCenter {
+        position: absolute;
+        display: block;
+        margin-top: 200px;
+        margin-bottom: 200px;
+        margin-left: auto;
+        margin-right: auto;
+        z-index: 5;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $("div[id$=dvProgress]").fadeOut("fast");
+    }
+</script>
+
+<img class="imgCenter" src="~/ViewLibaries/HomeIndex/Loading/images/Spinner-1s-200px.gif" />
+
+<div style="text-align: center; vertical-align: middle; font-family: Verdana; color: Blue; position: absolute; top: 50%; left: 50%; margin-left: -88px; font-size: small; z-index: 5" id="dvProgress" runat="server">
+    Please Wait ...<img src="~/ViewLibaries/HomeIndex/Loading/images/Spinner-1s-200px.gif" style="vertical-align: middle" alt="Processing" />
+</div>

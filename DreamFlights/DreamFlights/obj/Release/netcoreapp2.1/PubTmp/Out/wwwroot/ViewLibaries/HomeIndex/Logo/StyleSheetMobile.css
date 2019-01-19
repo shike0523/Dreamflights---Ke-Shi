@@ -1,0 +1,40 @@
+﻿/*渐变消失效果*/
+.masked {
+    margin-top: -55px;
+    background-image: -webkit-linear-gradient(left, transparent, transparent 25%, transparent 50%, transparent 85%,white );
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: border-box;
+    -webkit-background-size: 200% 100%;
+    -webkit-animation: masked-animation 1.5s linear;
+    animation-play-state: paused;
+}
+
+@-webkit-keyframes masked-animation {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+/*渐变消失效果*/
+
+#jet {
+    content: '';
+    z-index: 3;
+    -webkit-animation: jet 1.5s linear;
+    animation-play-state: paused;
+    -webkit-animation-delay: 0s;
+    animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes jet {
+    0% {
+        margin-left: -230px;
+    }
+
+    100% {
+        margin-left: 230px;
+    }
+}

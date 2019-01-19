@@ -1,0 +1,43 @@
+﻿@model DreamFlights.Models.City
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>City</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AirportName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AirportName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PostCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PostCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.StateOrTerritory)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StateOrTerritory)
+        </dd>
+        
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.CityID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

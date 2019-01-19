@@ -1,0 +1,137 @@
+.container {
+   margin:350px 0px 0px 10px;  //调整整个container的位置
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.Past{
+color:crimson;
+background-color: brown;   
+}
+
+.DayNow {   //当天
+color:red;
+background-color: cornflowerblue;
+}
+
+.Day{  
+color: green;
+}
+
+.DayPast{    //已经过去的日期
+color:black;
+background-color:dimgray;   
+}
+
+.DaySelected{
+    
+    background-color: darkgoldenrod;
+}
+
+ .triangle-up {
+     width: 0;
+     height: 0;
+     border-left: 50px solid transparent;
+     border-right: 50px solid transparent;
+     border-bottom: 100px solid red;
+ }
+
+
+.cssNav li{
+    height: 100px;
+    width: 100px;
+    padding: 0px 20px;   
+    line-height: 40px;  
+    background: #50abe4;  
+    display: inline-block;   
+    color: #fff;  
+    position: relative;  
+}
+
+    .shaft{/*画柄*/
+        margin-left: auto;
+        margin-right: auto;/*这两项auto是自动居中*/
+        width:2px;
+        height:30px;
+        background-color:black;/*填充柄为黑色*/
+    }
+
+    .arrowhead{/*画箭头*/
+        margin-left: auto;
+        margin-right: auto;/*这两项auto是自动居中*/
+        width: 0;
+        height: 0;/*将content设为0宽0高,可以创造出四个三角形环绕的div*/
+        border-left: 8px solid     transparent;/*将border左侧(三角形)隐藏*/
+        border-right: 8px solid transparent;/*将border右侧(三角形)隐藏*/
+        border-top: 12px solid black;/*将border顶侧(三角形)填充黑色*/
+    }
+
+#square { 
+width: 100px; 
+height: 100px; 
+background: blue; 
+}
+
+
+/*流程箭头*VVVVV*/
+.clearfix{
+          clear:both;
+        }
+      ul{
+          list-style:none;
+        }
+      li{
+          float:left;
+          width:165px;
+          height:105px;
+          position:relative;
+          list-style:none;
+          margin-left:-40px;    <!--控制每个流程箭头之间的横向间距-->
+        }  
+      .less{ 
+          border-style:dashed dashed dashed solid; 
+          border-color:transparent transparent transparent cornflowerblue; 
+          border-width:50px 0 50px 50px;
+          top:0;
+          
+      } /*dashed 设置透明*/
+      .less1{ 
+          border-style:dashed dashed dashed solid; 
+          border-color:transparent transparent transparent #fff; 
+          border-width:50px 0 50px 50px;
+          top:0;
+          z-index:1;
+        } 
+      .right{
+          right:0;
+        }
+      .left{
+          left:0;
+        }
+      samp{ display:block;position:absolute;z-index:2;}
+      span{ display:block;position:relative;float:left;z-index:3;}
+      .block{ width:165px; height:100px; line-height:30px; text-align:center; background:cornflowerblue; vertical-align:middle;color:#fff;float:left;z-index:1;}
+.airline{
+    width:250px !important;
+}
+.depart{
+    background-color: darkgray !important;
+    
+}
+.depart-arrow{
+    border-color: transparent transparent transparent darkgray !important;
+}
+/*流程箭头*^^^^^^*/
+
+
+
+#triangle-up { 
+width: 0; 
+height: 0; 
+border-left: 50px solid transparent; 
+border-right: 0px solid transparent; 
+border-bottom: 50px solid red; 
+border-top: 50px solid blue;
+}

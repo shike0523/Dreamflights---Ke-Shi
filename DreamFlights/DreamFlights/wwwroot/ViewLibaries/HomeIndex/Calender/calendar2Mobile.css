@@ -1,0 +1,266 @@
+﻿
+
+.Past {
+    color: cornflowerblue;
+    cursor: pointer;
+    background-color: #f5f5f5 !important;
+    border-style: solid;
+    border-width: 1px;
+    border-color: cornflowerblue;
+    opacity: 0.2 !important;
+    filter: alpha(opacity:20) !important;
+    -moz-opacity: 0.2 !important;
+    -khtml-opacity: 0.2 !important;
+}
+
+.DayNow {
+    background-color: cornflowerblue !important;
+    border-width: 1px;
+}
+
+.DayGo {
+    color: mediumseagreen;
+    font-weight: bold;
+    font-size: 12px;
+    border-width: 1px;
+    background-image: url('images/icons8-airplane-take-off-50.png');
+    background-size: 100% 100%;
+    padding: 0 0 5px 0 !important;
+}
+
+.DayReturn {
+    color: mediumseagreen;
+    font-weight: bold;
+    font-size: 12px;
+    border-width: 1px;
+    background-image: url('images/icons8-airplane-take-off-return-50.png');
+    background-size: 100% 100%;
+    padding: 0 0 5px 0 !important;
+}
+
+.Day {
+    color: cornflowerblue;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: cornflowerblue !important;
+    font-weight: bold;
+}
+
+.DayPast {
+    color: black;
+    background-color: dimgray !important;
+    border-width: 1px;
+    border-style: solid;
+    opacity: 1;
+}
+
+.DaySelected {
+    color: white;
+    background-color: dodgerblue !important;
+    border-style: solid;
+    border-width: 1px;
+    opacity: 0.8;
+    filter: alpha(opacity:80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    font-weight: bold;
+    border-color: dodgerblue;
+}
+
+.calendar {
+    background-color: #337ab7 !important;
+    padding: 1px 12px !important;
+}
+
+.navfunc {
+    background-color: transparent !important;
+    padding: -5px 12px !important;
+    border: 0px !important;
+}
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.btn-info-mycus {
+    color: #fff;
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+
+    .btn-info-mycus:focus,
+    .btn-info-mycus.focus {
+        color: #fff;
+        background-color: #31b0d5;
+        border-color: #1b6d85;
+    }
+
+    .btn-info-mycus:hover {
+        color: #fff;
+        background-color: #31b0d5;
+        border-color: #269abc;
+    }
+
+    .btn-info-mycus:active,
+    .btn-info-mycus.active,
+    .open > .dropdown-toggle.btn-info {
+        color: #fff;
+        background-color: #31b0d5;
+        border-color: #269abc;
+    }
+
+        .btn-info-mycus:active:hover,
+        .btn-info-mycus.active:hover,
+        .open > .dropdown-toggle.btn-info-mycus:hover,
+        .btn-info:active:focus,
+        .btn-info.active:focus,
+        .open > .dropdown-toggle.btn-info-mycus:focus,
+        .btn-info-mycus:active.focus,
+        .btn-info-mycus.active.focus,
+        .open > .dropdown-toggle.btn-info-mycus.focus {
+            color: #fff;
+            background-color: #269abc;
+            border-color: #1b6d85;
+        }
+
+    .btn-info-mycus:active,
+    .btn-info-mycus.active,
+    .open > .dropdown-toggle.btn-info-mycus {
+        background-image: none;
+    }
+
+    .btn-info-mycus.disabled:hover,
+    .btn-info-mycus[disabled]:hover,
+    fieldset[disabled] .btn-info-mycus:hover,
+    .btn-info-mycus.disabled:focus,
+    .btn-info-mycus[disabled]:focus,
+    fieldset[disabled] .btn-info-mycus:focus,
+    .btn-info-mycus.disabled.focus,
+    .btn-info-mycus[disabled].focus,
+    fieldset[disabled] .btn-info-mycus.focus {
+        background-color: #5bc0de;
+        border-color: #46b8da;
+    }
+
+    .btn-info-mycus .badge {
+        color: #5bc0de;
+        background-color: #fff;
+    }
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: rgba(0,0,0,0.2); /*暗淡的背景*/
+}
+
+#demo12 { /*三角形-横向*/
+    border: 10px solid transparent;
+    border-left-color: #f00;
+    width: 0;
+    height: 0;
+}
+/*空心箭头*/
+#arrow-hollow {
+    position: relative;
+}
+
+    #arrow-hollow:after, #arrow-hollow:before {
+        border: 10px solid transparent;
+        border-left: 10px solid #337ab7;
+        width: 0;
+        height: 0;
+        position: absolute;
+        top: 0;
+        right: -22px;
+        content: ' '
+    }
+
+    #arrow-hollow:before {
+        border-left-color: blue;
+        right: -26px;
+    }
+/*空心箭头*/
+/*空心箭头-反向*/
+#arrow-hollowR {
+    position: relative;
+}
+
+    #arrow-hollowR:after, #arrow-hollowR:before {
+        border: 10px solid transparent;
+        border-right: 10px solid #337ab7;
+        width: 0;
+        height: 0;
+        position: absolute;
+        top: 0;
+        right: -18px; /*反向时right/left参数要调换位置*/
+        content: ' '
+    }
+
+    #arrow-hollowR:before {
+        border-right-color: blue;
+        right: -14px; /*反向时right/left参数要调换位置*/
+    }
+/*空心箭头-反向*/
+/*按钮按下去后的样式*/
+.btnM {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+    .btnM:hover {
+        color: #333;
+        text-decoration: none;
+    }
+
+.btn-primaryM {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+    .btn-primaryM:hover {
+        color: #fff;
+        background-color: #286090;
+        border-color: #204d74;
+    }

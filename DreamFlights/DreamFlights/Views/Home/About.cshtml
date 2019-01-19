@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Read me";
+}
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+<p>ERD of this booking system:</p>
+<p>To make my transit stop searching algorithm easy to be examined and tested by employers, every route starts from 2 major cities: Sydney and Melbonure(like 2 hubs), meaning, aside from these 2 cities, other cites have to stop to transite to go to each other(aside from going to Sydney and Melbonure)</p>
+<img src="~/images/ERD.png" />
+
+<p>Features/Specifications</p>
+<div class="alert alert-success">
+    <strong>Main features of my airline booking website demo:</strong> This is airline booking system that helps gathering the amounts of booked seats of different airlines, to assist airline company to assign different airliners according their capacity(out of scope). All the data is randomly generated for testing.
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Part A(Management system)</div>
+    <div class="panel-body">
+        1, Automatically log out after 25 seconds inactivity of mouse movement or click(available in ScheduleManagement).
+
+        2, Automatically detect mobile devices(shown on home page).
+
+        3, Smart multi-filter search (available in ScheduleManagement)
+
+        4, Data constraint, keeping data integrity(foreign key constraint delete prevention, wrong data insert/edit prevention(shown in Flight_Schedule)).
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">Part B(main function of the website, only domestic airline available):</div>
+    <div class="panel-body">
+        <div class="row">
+            1, Transit stops searching according to the schedule database to get different depart times as many as possible, using recurrence algorithm, no fake data of routes or trips; every multi-stop strips has the earliest arrive time(later schedules have been filtered out); You can test this algorithm by adding or deleting schedules in "Flight_Schedule" management using schedule manager.
+        </div>
+        <div class="row">
+
+        </div>
+        <div class="row">
+            2, Multiple information(city name and state name) in autocomplete; Input mistake processing(if the booker dose not click any autocomplete item, the first item will be chosen by default); passing item's id other then label.
+
+        </div>
+        <div class="row">
+            3.Price calculation based on the passenger type and cabin.
+            calculation specification:
+            <h5>adults: <span class="label label-default">1*NetFaire</span></h5>
+            <h5>youths: <span class="label label-default">0.8*NetFaire</span></h5>
+            <h5>children: <span class="label label-default">0.5*NetFare</span></h5>
+            <h1></h1>
+            <h5>Economy: <span class="label label-success">1*NetFaire</span></h5>
+            <h5>Business: <span class="label label-success">1.3*NetFaire</span></h5>
+            <h5>Premium: <span class="label label-success">1.5*NetFaire</span></h5>
+            <h5>First: <span class="label label-success">2*NetFaire</span></h5>
+            
+        </div>
+        4, Booking information processing(in the last step of booking).
+    </div>
+</div>
+
+<div class="panel panel-success">
+    <div class="panel-heading">Part C (Software engineering)</div>
+    <div class="panel-body">
+        1, Dependency injection with async methods(ScheduleSearching interface, file name:ScheduleSearching.cs,IScheduleSearching.cs). If you can not see the code of this section, I can send to you over email.
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

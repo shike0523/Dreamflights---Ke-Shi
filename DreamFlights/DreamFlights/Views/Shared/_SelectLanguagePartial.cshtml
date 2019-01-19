@@ -1,0 +1,55 @@
+﻿<!--The whole file is for multilanguage selection, used in tandom with "LanguageSelect" folder in wwwroot and "SetLanguage" method in HomeController and file "Resources" and StartUp-->
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+
+@inject IViewLocalizer Localizer
+@inject IOptions<RequestLocalizationOptions> LocOptions
+
+<script src="~/lib/jquery/dist/jquery.js"></script>  <!--不加这个的话有些页面没法正常显示语言选项,因为有些页面没有引用这个lib-->
+
+<link href="~/ViewLibaries/HomeIndex/LanguageSelect/LangSelect.css" rel="stylesheet" />
+<script src="~/ViewLibaries/HomeIndex/LanguageSelect/LangSelect6.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var currentVal = $("#languageSelect").val();
+        $("#customCombobox1").html($("li[data-language-type=" + currentVal + "]").html());  //保证每次页面刷新时语言选项栏都有值
+        //$("#customCombobox1").next().show();
+    });
+</script>
+
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var cultureItems = LocOptions.Value.SupportedUICultures
+        .Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName })
+        .ToList();
+    var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}";
+}
+
+<div title="@Localizer["Request culture provider:"] @requestCulture?.Provider?.GetType().Name">
+    <form id="selectLanguage" asp-controller="Home"
+          asp-action="SetLanguage" asp-route-returnUrl="@returnUrl"
+          method="post" class="form-horizontal" role="form">
+        @*<label asp-for="@requestCulture.RequestCulture.UICulture.Name">@Localizer["Language:"]</label>*@
+        <div class="col-md-4">
+            <input id="languageSelect" name="culture" class="form-control" type="hidden" onchange="this.form.submit();" asp-for="@requestCulture.RequestCulture.UICulture.Name">
+            @*<select id="languageSelect" name="culture" class="form-control" onchange="this.form.submit();" asp-for="@requestCulture.RequestCulture.UICulture.Name">
+                <option value="en-US">english</option>
+                <option value="zh">chinese</option>
+            </select>*@
+        </div>
+        <div id="customCombobox1P" style="margin-top:5px">
+            <!--只有将class换成col-md-4才能让这个组件与周遭组件正常显示;<li>里面的图像只有正方形的才可以正常显示(不然上部有白框)-->
+            <div class="customCombobox" id="customCombobox1"></div>
+            <ul class="ulcustomCombobox" id="ulcustomCombobox1">
+                <!--data属性："data-language-type"-->
+                <li id="1" data-language-type="en-AU" style="background-color:black"><img src="~/ViewLibaries/HomeIndex/LanguageSelect/Images/australia.png" class="imgDisplay" style="width:37px;height:37px" /><span class="imageText"><font color="white">English</font> </span></li>
+                <li id="2" data-language-type="zh" style="background-color:black"><img src="~/ViewLibaries/HomeIndex/LanguageSelect/Images/taiwan.png" class="imgDisplay" style="width:37px;height:37px;" /><span class="imageText"><font color="white">繁体中文</font></span></li>
+                <li id="3" data-language-type="en-US" style="background-color:black"><img src="~/ViewLibaries/HomeIndex/LanguageSelect/Images/south-africa.png" class="imgDisplay" style="width:37px;height:37px;" /><span class="imageText"><font color="white">English</font></span></li>
+            </ul>
+        </div>
+    </form>
+</div>

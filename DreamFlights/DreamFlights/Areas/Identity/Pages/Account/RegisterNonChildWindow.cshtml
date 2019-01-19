@@ -1,0 +1,69 @@
+﻿@page
+@model RegisterNonChildWindowModel
+@{
+    ViewData["Title"] = "RegisterNonChildWindow";
+}
+
+@{
+    Layout = null;
+}
+
+<script>
+    $(document).ready(function () {
+        $("#submitRegister").click(function () {
+            $.ajax({
+                type: 'POST',
+                url: "/Identity/Account/RegisterNonChildWindow?handler=RegisterPartialView",
+
+                //为了Post的method而设
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: { 'Email': $("#email").val(), 'Password': $("#password").val(), 'ConfirmPassword': $("#confirmPassword").val() },
+                success: function (result) {
+                    //如果登陆成功则刷新页面
+                    if (result.startsWith("<h2>ExternalLoginSuceed</h2>")) {
+                        location.reload();
+                        //$("#LoginToPartialViewDisplay").html(result);
+                    } else {
+                        $("#LoginToPartialViewDisplay").html(result);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
+
+<div class="container">
+    <div class="col-md-3">
+        
+            <h4>Create a new account.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" id="email" class="form-control" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Password"></label>
+                <input asp-for="Input.Password" id="password" class="form-control" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword"></label>
+                <input asp-for="Input.ConfirmPassword" id="confirmPassword" class="form-control" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button id="submitRegister" class="btn btn-default">Register</button>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

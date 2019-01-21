@@ -1,5 +1,5 @@
 # Dreamflights---Ke-Shi
-The major techniques I applied:
+The major distinctive techniques I applied in this app:
 1. Dependency injection & recursion algorithm. 
 Interface path: \DreamFlights\Interface\IScheduleSearching.cs
 Dependency path: \DreamFlights\Dependencies

@@ -22,3 +22,7 @@ calling path: \DreamFlights\Controllers\HomeController.cs (method "PopulateViewM
 6.Internationaization(multilanguages):
 path: \DreamFlights\Resources\
 
+7. Ajax & json (Jquery)
+calling path: \DreamFlights\Views\Shared\_LoginPartialNonChildWindow.cshtml
+method path: \DreamFlights\Areas\Identity\Pages\Account\LoginNonChildWindow.cshtml.cs
+

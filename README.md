@@ -26,3 +26,9 @@ path: \DreamFlights\Resources\
 calling path: \DreamFlights\Views\Shared\_LoginPartialNonChildWindow.cshtml
 method path: \DreamFlights\Areas\Identity\Pages\Account\LoginNonChildWindow.cshtml.cs
 
+8. Brower detection in C#
+method path: \DreamFlights\UserAgent\
+calling path: \DreamFlights\Areas\Identity\Pages\Account\Login.cshtml.cs
+
+9. .NET Core Razor Page Authentication
+path: \DreamFlights\Areas\

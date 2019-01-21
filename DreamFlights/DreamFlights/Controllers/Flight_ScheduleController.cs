@@ -339,6 +339,7 @@ namespace DreamFlights.Controllers
             return _context.Flight_Schedules.Any(e => e.Flight_ScheduleID == id);
         }
 
+        //refresh current logined time to 0
         [HttpPost("[action]")]
         [Authorize]
         public async Task<IActionResult> Validate()

@@ -10,9 +10,8 @@
 <script>
     var idleTime = 0;
     $(document).ready(function () {
-        //Increment the idle time counter every minute.
+        //Increment the idle time counter for every second, calling the method "timerIncrement" in 1s interval.
         var idleInterval = setInterval(timerIncrement, 1000); // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间
-        //var idleIntervalReload = setInterval(timerIncrementReload, 1500);
 
         //Zero the idle timer on mouse movement.
         $(this).mousemove(function (e) {
@@ -23,12 +22,13 @@
         });
     });
 
-    // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间;每隔1秒都检查一次无操作时间是否到达5秒,如果到达了就刷新一次页面
+    //check the mouse movement for every second, if so, reset the sign in time by calling "Validate" method. If there is no movement for 25s, the view will be refreshed
+    // 每隔1秒检查一次鼠标是否有动静,如果有则刷新登陆cookie的时间;每隔1秒都检查一次无操作时间是否到达25秒,如果到达了就刷新一次页面
     function timerIncrement() {
         idleTime = idleTime + 1;
-        if (idleTime > 25) { // 25 seconds
+        if (idleTime > 25) { // 25 seconds(mouse has not been moved for 25 seconds)
             window.location.reload();
-        } else if (idleTime === 1) {
+        } else if (idleTime === 1) {  //mouse was moved just now
             $.ajax({
                     url: '@Url.Action("Validate", "Flight_Schedule")',  // 生成一个url,表示跳转到控制器下”Approver”下的"Validate"方法
                     type: "post"

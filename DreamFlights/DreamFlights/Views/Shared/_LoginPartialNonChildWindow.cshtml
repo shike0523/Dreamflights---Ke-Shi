@@ -6,6 +6,7 @@
 
 <script>
     $(document).ready(function () {
+        //call the method in C#
         //直接读取该项目中的Razor Page模块的内容
         $.get('/Identity/Account/LoginNonChildWindow?handler=LoginPartialView', function (result) {
             $('#LoginToPartialViewDisplay').html(result);

@@ -28,6 +28,7 @@ namespace DreamFlights.Dependencies
 
         public async Task<List<CandidateTrip>> SearchAsync(int FromCityID, int ToCityID, string takeoffDate, int adults, int Youths, int Children, string cabin)
         {
+            //reset the value of "tripList", preventing the tripList of depart and return in the same tripList
             //清空上一次计算(出发航班)的tripList,防止出发和返程的tripList放在同一个tripList里面
             tripList.Clear();
             string tempTrip = "";
@@ -80,10 +81,10 @@ namespace DreamFlights.Dependencies
             {
                 Flight_Schedule flight_Schedule =  flightContext.Where(x => x.Route.FromCityID == FromCityID)
                     .Where(x => x.Route.ToCityID == ToCityID)
-                    .Where(x => x.DepartDateTime > NextEarliestDepartLimit)  //确保只获取晚于当前时间的航班
+                    .Where(x => x.DepartDateTime > NextEarliestDepartLimit)  //(filter out the fights that too late to book)确保只获取晚于当前时间的航班
                     .Where(x => x.DepartDateTime.Date.ToString("d") == NextEarliestDepartLimit.Date.ToString("d"))
-                    .OrderBy(x => x.DepartDateTime)  //取起飞时间最早的转机航班
-                    .FirstOrDefault();               //取起飞时间最早的转机航班
+                    .OrderBy(x => x.DepartDateTime)  //(get the earliest flight from the candidate flights)取起飞时间最早的转机航班
+                    .FirstOrDefault();               //(get the earliest flight from the candidate flights)取起飞时间最早的转机航班
                 if (flight_Schedule != null)
                 {
                     //trip.Add(route.RouteID);
@@ -112,13 +113,15 @@ namespace DreamFlights.Dependencies
                 }
                 else if (searchCount < 2)
                 {
+                    //”citiesNameInTrip“ prevents the searching route of recursion algorithm from being a dead loop(one route contains 2 identical cities)
                     //”citiesNameInTrip“防止搜索路线成为一个环(同一条路线中包含两个相同的城市)
                     citiesNameInTrip.Add(FromCityID);
+                    //iterate all the adjacent cities, using recursion algorithm in each adjacent city
                     //依次遍历当前节点的所有相邻节点,并逐个进行递归(SearchSchedules)
                     foreach (var t in  flightContext.Where(x => x.Route.FromCityID == FromCityID)
                         .Where(x => !citiesNameInTrip.Contains(x.Route.ToCityID))
                         .Where(x => x.DepartDateTime > NextEarliestDepartLimit)
-                        .Where(x => x.DepartDateTime.Date.ToString("d") == NextEarliestDepartLimit.Date.ToString("d"))  //保证在同一天
+                        .Where(x => x.DepartDateTime.Date.ToString("d") == NextEarliestDepartLimit.Date.ToString("d"))  //(ensure all the results are in the same day)保证在同一天
                         .GroupBy(x => x.Route.FromCity)
                         .Select(x => x.OrderBy(y => y.DepartDateTime)).Select(x => x.First()))   //CAUTION: 取起飞时间最早的转机航班
                     {
@@ -126,7 +129,7 @@ namespace DreamFlights.Dependencies
                             //tripTemp.Add(t.RouteID);
                             string tripTemp = trip + " " + t.Flight_ScheduleID.ToString();
                             searchCount++;
-                            await SearchSchedules(t.Route.ToCityID, ToCityID, tripTemp, searchCount, t.ArriveDateTime.AddHours(1)); //确保转乘航班间有1个小时的间隔
+                            await SearchSchedules(t.Route.ToCityID, ToCityID, tripTemp, searchCount, t.ArriveDateTime.AddHours(1)); //(ensure there is at least 1 hour in a stop)确保转乘航班间有1个小时的间隔
                             searchCount--;
                         }
 
@@ -163,9 +166,11 @@ namespace DreamFlights.Dependencies
                 }
 
                 citiesNameInTrip.Add(FromCityID);
+                //iterate all the adjacent cities, using recursion algorithm in each adjacent city
                 //依次遍历当前节点的所有相邻节点,并逐个进行递归(SearchSchedules)
                 foreach (var t in  flightContext.Where(x => x.Route.FromCityID == FromCityID).Where(x => x.Route.ToCityID != ToCityID))
                 {
+                    //store the depart time of the 1st city as the depart time of a trip
                     //保存第一站的出发时间作为最终路线的出发时间
                     departTime = t.DepartDateTime;
                     string tripTemp = trip + " " + t.Flight_ScheduleID.ToString();

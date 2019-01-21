@@ -73,6 +73,7 @@ namespace DreamFlights.Data.Repositories
                         
                         for (int i = 0; i< passangers; i++)
                         {
+                            //generate a specific booking transaction(BookingTransaction) for every passanger
                             //每一个passanger都单独生成一比业务记录(BookingTransaction)
                             BookingTransaction bookingTransaction = new BookingTransaction { BookingDateTime = bookingDateTime, DepartDateTime = flight_Schedule.DepartDateTime, Flight_ScheduleID = flight_Schedule.Flight_ScheduleID, PersonalID = "", SuspendedID = suspendedID, CabinType = (CabinType)Enum.Parse(typeof(CabinType), cabin), Suspended = true };
                             _context.Add(bookingTransaction);

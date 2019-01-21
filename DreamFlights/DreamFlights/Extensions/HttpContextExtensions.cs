@@ -10,6 +10,7 @@ namespace DreamFlights.Extensions
 {
     public static class HttpContextExtensions
     {
+        //refresh current logined time to 0
         public static async Task RefreshLoginAsync(this HttpContext context)
         {
             if (context.User == null)

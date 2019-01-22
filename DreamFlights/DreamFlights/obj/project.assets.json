@@ -12330,11 +12330,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lenovo\\Documents\\Visual Studio 2017\\Projects\\DreamFlights\\DreamFlights\\DreamFlights.csproj",
+      "projectUniqueName": "C:\\Users\\lenovo\\Documents\\Visual Studio 2017\\Projects\\Dreamflights---Ke-Shi\\DreamFlights\\DreamFlights\\DreamFlights.csproj",
       "projectName": "DreamFlights",
-      "projectPath": "C:\\Users\\lenovo\\Documents\\Visual Studio 2017\\Projects\\DreamFlights\\DreamFlights\\DreamFlights.csproj",
+      "projectPath": "C:\\Users\\lenovo\\Documents\\Visual Studio 2017\\Projects\\Dreamflights---Ke-Shi\\DreamFlights\\DreamFlights\\DreamFlights.csproj",
       "packagesPath": "C:\\Users\\lenovo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lenovo\\Documents\\Visual Studio 2017\\Projects\\DreamFlights\\DreamFlights\\obj\\",
+      "outputPath": "C:\\Users\\lenovo\\Documents\\Visual Studio 2017\\Projects\\Dreamflights---Ke-Shi\\DreamFlights\\DreamFlights\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

@@ -109,6 +109,7 @@ namespace DreamFlights.Controllers
                     "Visit alert!",
                     $"Some one open your dreamflights");
 
+            //get the cookie values and put into viewbags
             //把cookie的值放入页面
             ViewBag.FromCityName = _cookieControl.Get("FromCityName");
             ViewBag.ToCityName = _cookieControl.Get("ToCityName");

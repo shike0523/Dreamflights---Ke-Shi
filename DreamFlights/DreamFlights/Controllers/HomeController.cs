@@ -123,6 +123,7 @@ namespace DreamFlights.Controllers
             ViewBag.children = _cookieControl.Get("children");
             ViewBag.cabin= _cookieControl.Get("cabin");
 
+            //if TempData["SessionTimeout"] has value, which means session has timed out, then display "session timed out" in the main page
             //如果session过期就返回主页,并以TempData["SessionTimeout"]作为session过期的信号
             if (TempData["SessionTimeout"] != null)
             {
@@ -321,6 +322,7 @@ namespace DreamFlights.Controllers
         {
             int suspendedID;
 
+            //if session has no value, which means session has timed out, then redirect to view "index"
             //如果session过期就返回主页,并以TempData["SessionTimeout"]作为session过期的信号,if中的条件是某个session(随机选取)是否还存在
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyAdults)))
             {
@@ -354,6 +356,7 @@ namespace DreamFlights.Controllers
             ViewBag.youths = HttpContext.Session.GetInt32(SessionKeyYouths);
             ViewBag.children = HttpContext.Session.GetInt32(SessionKeyChildren);
             ViewBag.cabin = HttpContext.Session.GetString(SessionKeyCabin);
+            
             //传递oneway或者return的信号
             ViewBag.onewayOrReturn = HttpContext.Session.GetString(SessionKeyonewayOrReturn);
             
@@ -370,6 +373,7 @@ namespace DreamFlights.Controllers
             HttpContext.Session.SetInt32(SessionKeySuspendedIDDepart, suspendedID);
             await _flight_ScheduleRepository.SaveAsync();
 
+            //process the ticket data of return
             //对return的订票数据进行处理
             if (HttpContext.Session.GetString(SessionKeyonewayOrReturn) == "return")
             {
@@ -395,6 +399,7 @@ namespace DreamFlights.Controllers
 
         public async Task<IActionResult> ConfirmBook(string[] lastName, string[] firstName, string[] ID, string[] email)
         {
+            //if session has no value, which means session has timed out, then redirect to view "index"
             //如果session过期就返回主页,并以TempData["SessionTimeout"]作为session过期的信号
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(SessionKeyAdults)))
             {
@@ -471,6 +476,7 @@ namespace DreamFlights.Controllers
             int suspendedIDReturn = HttpContext.Session.GetInt32(SessionKeySuspendedIDReturn).HasValue ? HttpContext.Session.GetInt32(SessionKeySuspendedIDReturn).Value : 0;
             //DateTime bookingDateTime = DateTime.Parse(HttpContext.Session.GetString(SessionKeyBookingDateTime));
 
+            //if user has not logged in, then skip the "var user = await _userManager.GetUserAsync(User);"
             //如果用户没有登陆,那么不执行"_userManager.GetUserAsync(User)"语句,不然系统会报错
             if (_signInManager.IsSignedIn(User))
             {
@@ -531,6 +537,7 @@ namespace DreamFlights.Controllers
             ViewBag.stops1 = stops1;
             ViewBag.stops2 = stops2;
 
+            //set the slider value after refreshing view
             //设置页面刷新后slider的值(<input id="timeEarliestFromDepart" name="timeEarliestFromDepart" value="@ViewBag.timeEarliestFromDepart">)(values: [$("#timeEarliestFromDepart").val(), $("#timeLatiestFromDepart").val()],)
             ViewBag.timeEarliestFromDepart = timeEarliestFromDepart;
             ViewBag.timeLatiestFromDepart = timeLatiestFromDepart;

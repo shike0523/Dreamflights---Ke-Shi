@@ -209,9 +209,11 @@ namespace DreamFlights.Controllers
 
         public async Task<IActionResult> Search(string userAgent, string FromCityName, string ToCityName, int FromCityID, int ToCityID, string startTime, string returnTime, int adults, int youths, int children, string cabin, string onewayOrReturn)
         {
+            //prevent errors after swaping languages
             //防止在这一步时切换语言文化后出现报错(表单的值为空)
             if(FromCityName != null)
             {
+                //store the values submited from form into cookies
                 //把页面表单提交传过来的值放入cookie长期保存
                 _cookieControl.Set("FromCityName", FromCityName, 1000);
                 _cookieControl.Set("ToCityName", ToCityName, 1000);
@@ -227,6 +229,7 @@ namespace DreamFlights.Controllers
             }
             else
             {
+                //if the parameters of this function is null(meaning the languange was changed in the corresponding view), then fetch parameter values from cookie
                 FromCityName = _cookieControl.Get("FromCityName");
                 ToCityName = _cookieControl.Get("ToCityName");
                 FromCityID = Int32.Parse(_cookieControl.Get("FromCityID"));
@@ -240,6 +243,7 @@ namespace DreamFlights.Controllers
                 returnTime = _cookieControl.Get("returnTime");
             }           
 
+            //clear the session values of last request
             //清除上一次的请求时遗留下的session,防止数据错乱
             HttpContext.Session.Clear();
 
@@ -256,6 +260,7 @@ namespace DreamFlights.Controllers
             }
 
             ViewBag.cabin = cabin;
+            //pass on the indicator for "oneway" or "return"
             //传递oneway或者return的信号
             ViewBag.onewayOrReturn = onewayOrReturn;
 
@@ -263,7 +268,7 @@ namespace DreamFlights.Controllers
             ViewBag.stops1 = 1;
             ViewBag.stops2 = 2;
 
-            //slider的初始值
+            //slider的初始值(initial value of slider)
             ViewBag.timeEarliestFromDepart = 0;
             ViewBag.timeLatiestFromDepart = 1439;
             ViewBag.timeEarliestFromArrive = 0;
@@ -285,6 +290,7 @@ namespace DreamFlights.Controllers
                 PopulateViewModel(returnViewModel, returnCandidateTrip);
             }
             
+            //put the entire list of viewmodel into viewbag
             //整个List<CandidateTripVM>的ViewModel放入ViewBag中
             ViewBag.Trips = departViewModel;
             ViewBag.TripsReturn = returnViewModel;
@@ -531,6 +537,7 @@ namespace DreamFlights.Controllers
             return Json(c);
         }
 
+        //process the time data submited from the time slider in the "Search" view, and filter out unwanted fight ticket according the time data. 
         public IActionResult FilterForm(string userAgent, int timeEarliestFromDepart, int timeLatiestFromDepart, int timeEarliestToDepart, int timeLatiestToDepart, int timeEarliestFromArrive, int timeLatiestFromArrive, int timeEarliestToArrive, int timeLatiestToArrive, int stops0, int stops1, int stops2)
         {
             ViewBag.stops0 = stops0;
@@ -561,6 +568,7 @@ namespace DreamFlights.Controllers
             //Get the total amount of candidate trips(tripTagTempData) from session
             var tripTagTempData = HttpContext.Session.GetInt32(SessionKeyTripTagTempDataOnewayTrip);
 
+            //store the candidate trips matched the time data from the slider
             var ViewModel = new List<CandidateTripVM>();  //存储出发航班
             var ViewModelReturn = new List<CandidateTripVM>();  //存储返程航班
 
@@ -574,11 +582,13 @@ namespace DreamFlights.Controllers
                 var tempCTVMSerialized = (string)TempData.Peek(tt.ToString());
                 var tempCTVM = JsonConvert.DeserializeObject<CandidateTripVM>(tempCTVMSerialized);
 
+                //match the processed time data of time slider against those in the candidate trips in the Tempdata
                 //将表单提交过来的时间数据(timeEarliestFromDepartConverted...)与日期合并后方便与TempData中的时间数据(tempCTVM.DepartTime)进行大小对比
                 timeEarliest = tempCTVM.DepartTime >= DateTime.Parse(tempCTVM.DepartTime.Date.ToString("d") + " " + timeEarliestFromDepartConverted) && tempCTVM.ArrivetTime >= DateTime.Parse(tempCTVM.ArrivetTime.Date.ToString("d") + " " + timeEarliestFromArriveConverted);
                 timeLatiest = tempCTVM.DepartTime <= DateTime.Parse(tempCTVM.DepartTime.Date.ToString("d") + " " + timeLatiestFromDepartConverted) && tempCTVM.ArrivetTime <= DateTime.Parse(tempCTVM.ArrivetTime.Date.ToString("d") + " " + timeLatiestFromArriveConverted);
                 stops = tempCTVM.stopList.Count() - 2 == stops0 || tempCTVM.stopList.Count() - 2 == stops1 || tempCTVM.stopList.Count() - 2 == stops2;
 
+                //pick up the candidate trips that meet the 3 conditions down below
                 //只对满足以上3组条件的数据进行输出(放入ViewModel/ViewModelReturn中)
                 if (timeEarliest && timeLatiest && stops)
                 {
@@ -586,6 +596,7 @@ namespace DreamFlights.Controllers
                 }
                 
             }
+            //pass the matched candidate trips(depart) to the view
             //viewbag存储的只是地址,所以要分成Trips和TripsReturn,同时此处不要用clear函数来清除ViewModel,不然前者会被后者TripsReturn覆盖掉
             ViewBag.Trips = ViewModel;
 
@@ -607,6 +618,7 @@ namespace DreamFlights.Controllers
 
             }
 
+            //pass the matched candidate trips(return) to the view
             ViewBag.TripsReturn = ViewModelReturn;
 
             //存储slider filter标题(Take off:/Landing:)
@@ -681,6 +693,7 @@ namespace DreamFlights.Controllers
             return hoursS + ":" + minutesS + " " + time;
         }
 
+        //put candidate trips into Tempdata to make them easy to be fetched by the time slider in the "Search" view 
         public void PopulateViewModel(List<CandidateTripVM> departViewModel, List<CandidateTrip> departCandidateTrip)
         {
             //tripTagTempData serves as an index in storing candidate trips in TempData;SessionKeyTripTagTempDataOnewayTrip存储备选出发航班表的的总数,SessionKeyTripTagTempDataRoundTrip-SessionKeyTripTagTempDataOnewayTrip为备选返程航班表的的总数
